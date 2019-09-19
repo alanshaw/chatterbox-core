@@ -1,0 +1,276 @@
+# IPFS Chatterbox
+
+## MFS layout
+
+```
+/.chatterbox
+├── friends.json  # Array of Peer IDs
+├── peers
+|   ├── QmPeer0
+|   |   ├── profile.json   # Peer profile object
+|   |   └── messages.json  # Array of received messages
+|   ├── QmPeer1
+|   └── QmPeer2
+└── version.json  # Data store layout version
+```
+
+### `friends.json`
+
+List of Peer IDs that the user has "made friends" with.
+
+```json
+[
+  "QmFriend0",
+  "QmFriend1",
+  "QmFriend2"
+]
+```
+
+### `profile.json`
+
+Peer profile data. Note that user _is a_ peer so their info is stored here also.
+
+```json
+{
+  "id": "QmPeerId",
+  "name": "Dave",
+  "avatar": "http://ipfs.io/ipfs/QmAvatar",
+  "lastSeenAt": 1568883407737,
+  "lastMessage": {
+    "id": "HexMessageId",
+    "text": "Hello World!",
+    "receivedAt": 1568883407737,
+    "readAt": 1568883407737
+  }
+}
+```
+
+### `messages.json`
+
+Length limited messages received by a peer. Stored by `receivedAt` in descending order.
+
+```json
+[
+  {
+    "id": "HexMessageId",
+    "text": "Hello World!",
+    "receivedAt": 1568883407737,
+    "readAt": 1568883407737
+  }
+]
+```
+
+## Core API
+
+### Constructor
+
+```js
+const cbox = Chatterbox([options])
+```
+
+### `cbox.friends`
+
+Manage friends.
+
+#### `cbox.friends.list()`
+
+Get the current friends list.
+
+Returns `Promise<Object[]>`
+
+Each friend:
+
+* `id: String`
+* `name: String`
+* `avatar: String`
+* `lastSeenAt: Number`
+* `lastMessage: Object`
+    * `id: String`
+    * `text: String`
+    * `receivedAt: Number`
+    * `readAt: Number`
+
+#### `cbox.friends.feed([options])`
+
+Live updating friend list.
+
+* `options: Object`
+    * `signal: AbortSignal`
+
+Returns `AsyncIterable<Object[]>`
+
+```js
+for await (const list of cbox.friends.feed())
+  list.forEach(friend => console.log(friend))
+```
+
+Each friend:
+
+* `id: String`
+* `name: String`
+* `avatar: String`
+* `lastSeenAt: Number`
+* `lastMessage: Object`
+    * `id: String`
+    * `text: String`
+    * `receivedAt: Number`
+    * `readAt: Number`
+
+#### `cbox.friends.add(peerId, [details])`
+
+* `peerId: String`
+* `details: Object`
+    * `name: String`
+    * `avatar: String`
+
+Returns `Promise`
+
+#### `cbox.friends.remove(peerId)`
+
+* `peerId: String`
+
+Returns `Promise`
+
+
+### `cbox.peers`
+
+Information about peers in the chatterbox network.
+
+#### `cbox.peers.get(peerId)`
+
+Get details stored for the passed Peer ID.
+
+* `peerId: String`
+
+Returns `Promise<Object>`
+
+Peer details:
+
+* `id: String`
+* `name: String`
+* `avatar: String`
+* `lastSeenAt: Number`
+* `lastMessage: Object`
+    * `id: String`
+    * `text: String`
+    * `receivedAt: Number`
+    * `readAt: Number`
+
+#### `cbox.peers.feed([options])`
+
+Live updating list of peers in the chatterbox network.
+
+* `options: Object`
+    * `filter: Function`
+    * `signal: AbortSignal`
+
+Returns `AsyncIterable<Object[]>`
+
+```js
+for await (const list of cbox.peers.feed())
+  list.forEach(peer => console.log(peerId))
+```
+
+Each peerId:
+
+* `id: String`
+* `name: String`
+* `avatar: String`
+* `lastSeenAt: Number`
+* `lastMessage: Object`
+    * `id: String`
+    * `text: String`
+    * `receivedAt: Number`
+    * `readAt: Number`
+
+#### `cbox.peers.gc([options])`
+
+Clean up peers. Pass an optional filter function to avoid collecting friends.
+
+* `options: Object`
+    * `filter: Function`
+
+Returns `Promise`
+
+
+### `cbox.messages`
+
+Manage messages received from peers.
+
+#### `cbox.messages.list(peerId)`
+
+Get the messages stored for a given peer.
+
+Returns `Promise<Object[]>`
+
+Each message:
+
+* `id: String`
+* `text: String`
+* `receivedAt: Number`
+* `readAt: Number`
+
+#### `cbox.messages.feed(peerId, [options])`
+
+Live updating list of messages for a given peer.
+
+* `peerId: String`
+* `options: Object`
+    * `signal: AbortSignal`
+
+Returns `AsyncIterable<Object[]>`
+
+```js
+for await (const list of cbox.messages.feed('Qm...'))
+  list.forEach(msg => console.log(msg))
+```
+
+Each message:
+
+* `id: String`
+* `text: String`
+* `receivedAt: Number`
+* `readAt: Number`
+
+#### `cbox.messages.read(peerId, messageId)`
+
+Set the `readAt` field for a given message to the current time (if not already set).
+
+* `peerId: String`
+* `messageId: String`
+
+Returns `Promise`
+
+
+### `cbox.profile`
+
+#### `cbox.profile.get()`
+
+Get the current user's profile.
+
+* `id: String`
+* `name: String`
+* `avatar: String`
+* `lastSeenAt: Number`
+* `lastMessage: Object`
+    * `text: String`
+    * `receivedAt: Number`
+    * `readAt: Number`
+
+Returns `Promise<Object>`
+
+#### `cbox.profile.setName(name)`
+
+Set the current user's name/handle.
+
+* `name: String`
+
+Returns `Promise`
+
+#### `cbox.profile.setAvatar(url)`
+
+Set the current user's avatar URL.
+
+* `url: String`
+
+Returns `Promise`
