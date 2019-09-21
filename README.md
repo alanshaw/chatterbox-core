@@ -62,33 +62,44 @@ Length limited messages received by a peer. Stored by `receivedAt` in descending
 
 ## Core API
 
+* [Constructor](#constructor)
+* [cbox.friends](#cbox-friends)
+    * [cbox.friends.add](#cbox-friends-add-peerid-details)
+    * [cbox.friends.feed](#cbox-friends-feed-options)
+    * [cbox.friends.list](#cbox-friends-list)
+    * [cbox.friends.remove](#cbox-friends-remove-peerid)
+* [cbox.messages](#cbox-messages)
+    * [cbox.messages.broadcast](#cbox-messages-broadcast-text)
+    * [cbox.messages.feed](#cbox-messages-feed-peerid-options)
+    * [cbox.messages.list](#cbox-messages-list-peerid)
+    * [cbox.messages.read](#cbox-messages-read-peerid-messageid)
+* [cbox.peers](#cbox-peers)
+    * [cbox.peers.feed](#cbox-peers-feed-options)
+    * [cbox.peers.gc](#cbox-peers-gc-options)
+    * [cbox.peers.get](#cbox-peers-get-peerid)
+    * [cbox.peers.set](#cbox-peers-set-peerid-details)
+* [cbox.profile](#cbox-profile)
+    * [cbox.profile.get](#cbox-profile-get)
+    * [cbox.profile.set](#cbox-profile-set-details)
+
 ### Constructor
 
 ```js
-const cbox = Chatterbox([options])
+const cbox = await chatterbox([options])
 ```
 
 ### `cbox.friends`
 
 Manage friends.
 
-#### `cbox.friends.list()`
+#### `cbox.friends.add(peerId, [details])`
 
-Get the current friends list.
+* `peerId: String`
+* `details: Object`
+    * `name: String`
+    * `avatar: String`
 
-Returns `Promise<Object[]>`
-
-Each friend:
-
-* `id: String`
-* `name: String`
-* `avatar: String`
-* `lastSeenAt: Number`
-* `lastMessage: Object`
-    * `id: String`
-    * `text: String`
-    * `receivedAt: Number`
-    * `readAt: Number`
+Returns `Promise`
 
 #### `cbox.friends.feed([options])`
 
@@ -116,35 +127,13 @@ Each friend:
     * `receivedAt: Number`
     * `readAt: Number`
 
-#### `cbox.friends.add(peerId, [details])`
+#### `cbox.friends.list()`
 
-* `peerId: String`
-* `details: Object`
-    * `name: String`
-    * `avatar: String`
+Get the current friends list.
 
-Returns `Promise`
+Returns `Promise<Object[]>`
 
-#### `cbox.friends.remove(peerId)`
-
-* `peerId: String`
-
-Returns `Promise`
-
-
-### `cbox.peers`
-
-Information about peers in the chatterbox network.
-
-#### `cbox.peers.get(peerId)`
-
-Get details stored for the passed Peer ID.
-
-* `peerId: String`
-
-Returns `Promise<Object>`
-
-Peer details:
+Each friend:
 
 * `id: String`
 * `name: String`
@@ -156,9 +145,77 @@ Peer details:
     * `receivedAt: Number`
     * `readAt: Number`
 
+#### `cbox.friends.remove(peerId)`
+
+* `peerId: String`
+
+Returns `Promise`
+
+
+### `cbox.messages`
+
+Manage messages received from peers.
+
+#### `cbox.messages.broadcast(text)`
+
+Send a message to all peers connected to the chatterbox network. Note: this is a temporary PoC API call!
+
+* `text: String`
+
+Returns `Promise`
+
+#### `cbox.messages.feed(peerId, [options])`
+
+Live updating list of messages for a given peer.
+
+* `peerId: String`
+* `options: Object`
+    * `signal: AbortSignal`
+
+Returns `AsyncIterable<Object[]>`
+
+```js
+for await (const list of cbox.messages.feed('Qm...'))
+  list.forEach(msg => console.log(msg))
+```
+
+Each message:
+
+* `id: String`
+* `text: String`
+* `receivedAt: Number`
+* `readAt: Number`
+
+#### `cbox.messages.list(peerId)`
+
+Get the messages stored for a given peer.
+
+Returns `Promise<Object[]>`
+
+Each message:
+
+* `id: String`
+* `text: String`
+* `receivedAt: Number`
+* `readAt: Number`
+
+#### `cbox.messages.read(peerId, messageId)`
+
+Set the `readAt` field for a given message to the current time (if not already set).
+
+* `peerId: String`
+* `messageId: String`
+
+Returns `Promise`
+
+
+### `cbox.peers`
+
+Information about peers in the chatterbox network.
+
 #### `cbox.peers.feed([options])`
 
-Live updating list of peers in the chatterbox network.
+Live updating list of known peers in the chatterbox network.
 
 * `options: Object`
     * `filter: Function`
@@ -192,54 +249,39 @@ Clean up peers. Pass an optional filter function to avoid collecting friends.
 
 Returns `Promise`
 
+#### `cbox.peers.get(peerId)`
 
-### `cbox.messages`
-
-Manage messages received from peers.
-
-#### `cbox.messages.list(peerId)`
-
-Get the messages stored for a given peer.
-
-Returns `Promise<Object[]>`
-
-Each message:
-
-* `id: String`
-* `text: String`
-* `receivedAt: Number`
-* `readAt: Number`
-
-#### `cbox.messages.feed(peerId, [options])`
-
-Live updating list of messages for a given peer.
+Get details stored for the passed Peer ID.
 
 * `peerId: String`
-* `options: Object`
-    * `signal: AbortSignal`
 
-Returns `AsyncIterable<Object[]>`
+Returns `Promise<Object>`
 
-```js
-for await (const list of cbox.messages.feed('Qm...'))
-  list.forEach(msg => console.log(msg))
-```
-
-Each message:
+Peer details:
 
 * `id: String`
-* `text: String`
-* `receivedAt: Number`
-* `readAt: Number`
+* `name: String`
+* `avatar: String`
+* `lastSeenAt: Number`
+* `lastMessage: Object`
+    * `id: String`
+    * `text: String`
+    * `receivedAt: Number`
+    * `readAt: Number`
 
-#### `cbox.messages.read(peerId, messageId)`
+#### `cbox.peers.set(peerId, details)`
 
-Set the `readAt` field for a given message to the current time (if not already set).
+Set properties for a peer.
 
 * `peerId: String`
-* `messageId: String`
-
-Returns `Promise`
+* `details: Object`
+    * `name: String`
+    * `avatar: String`
+    * `lastMessage: Object`
+        * `id: String`
+        * `text: String`
+        * `receivedAt: Number`
+        * `readAt: Number`
 
 
 ### `cbox.profile`
@@ -259,18 +301,12 @@ Get the current user's profile.
 
 Returns `Promise<Object>`
 
-#### `cbox.profile.setName(name)`
+#### `cbox.profile.set(details)`
 
-Set the current user's name/handle.
+Set the current user's profile properties.
 
-* `name: String`
-
-Returns `Promise`
-
-#### `cbox.profile.setAvatar(url)`
-
-Set the current user's avatar URL.
-
-* `url: String`
+* `details: Object`
+    * `name: String`
+    * `url: String`
 
 Returns `Promise`
