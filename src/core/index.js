@@ -14,11 +14,12 @@ module.exports = async (ipfs, options) => {
   }
 
   const peers = require('./peers')({ ipfs, config })
+  const friends = require('./friends')({ ipfs, peers, config })
 
   return {
     peers,
     profile: require('./profile')({ ipfs, peers, config }),
-    friends: require('./friends')({ ipfs, peers, config }),
-    messages: require('./messages')({ ipfs, peers, config })
+    friends,
+    messages: require('./messages')({ ipfs, peers, friends, config })
   }
 }

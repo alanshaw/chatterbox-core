@@ -4,6 +4,7 @@ const Validate = require('./validate')
 module.exports = ({
   ipfs,
   peers,
+  friends,
   getMutex,
   syndicate,
   getMessagesPath,
@@ -21,12 +22,17 @@ module.exports = ({
 
     try {
       const message = { id: messageId, text, receivedAt }
-      const messages = await getMessagesList()
+      let messages = await getMessagesList()
+      const friendsList = await friends.list()
 
-      messages.unshift(message)
+      if (friendsList.includes(peerId)) {
+        messages = messages.concat(message)
 
-      if (messages.length > messageHistorySize) {
-        messages.pop()
+        if (messages.length > messageHistorySize) {
+          messages = messages.slice(1)
+        }
+      } else {
+        messages = [message]
       }
 
       const data = Buffer.from(JSON.stringify(messages))

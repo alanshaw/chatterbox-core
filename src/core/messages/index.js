@@ -2,7 +2,7 @@ const mortice = require('mortice')
 const log = require('debug')('chatterbox:messages')
 const Syndicate = require('../lib/syndicate')
 
-module.exports = ({ ipfs, peers, config }) => {
+module.exports = ({ ipfs, peers, friends, config }) => {
   const getPeersPath = () => `${config.repoDir}/peers`
   const getPeerPath = peerId => `${getPeersPath()}/${peerId}`
   const getMessagesPath = peerId => `${getPeerPath(peerId)}/messages.json`
@@ -32,6 +32,7 @@ module.exports = ({ ipfs, peers, config }) => {
   const addMessage = require('./add')({
     ipfs,
     peers,
+    friends,
     syndicate,
     getMutex,
     getMessagesPath,

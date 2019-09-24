@@ -47,7 +47,7 @@ Peer profile data. Note that user _is a_ peer so their info is stored here also.
 
 ### `messages.json`
 
-Length limited messages received by a peer. Stored by `receivedAt` in descending order.
+Length limited messages received by a peer. Stored by `receivedAt` in ascending order.
 
 ```json
 [
@@ -286,3 +286,8 @@ Set the current user's profile properties.
     * `url: String`
 
 Returns `Promise`
+
+## Ideas
+
+1. Message index file `messages/index.json` and then per message file as id (`messages/[id].json`) or `receivedAt` time (`messages/1568883407737.json`).
+2. ndjson messages file `messages.ndjson` for streaming
