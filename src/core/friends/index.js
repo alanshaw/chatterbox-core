@@ -28,11 +28,9 @@ module.exports = ({ ipfs, peers, config }) => {
 
   const syndicate = Syndicate()
 
-
   const add = require('./add')({ peers, getMutex, getFriendsPeerIds, setFriendsPeerIds, syndicate })
   const remove = require('./remove')({ getMutex, getFriendsPeerIds, setFriendsPeerIds, syndicate })
-  const list = require('./list')({ peers, getMutex, getFriendsPeerIds })
-  const feed = require('./feed')({ peers, getMutex, syndicate })
+  const feed = require('./feed')({ getFriendsPeerIds, syndicate })
 
-  return { add, remove, list }
+  return { add, remove, list: getFriendsPeerIds, feed }
 }
