@@ -3,7 +3,7 @@ const { AbortError } = require('abortable-iterator')
 const pushable = require('it-pushable')
 const pipe = require('it-pipe')
 
-module.exports = ({ getFriendsPeerIds, syndicate }) => {
+module.exports = ({ getFriendsList, syndicate }) => {
   return options => {
     options = options || {}
 
@@ -17,7 +17,7 @@ module.exports = ({ getFriendsPeerIds, syndicate }) => {
 
       try {
         const updater = source => (async function * () {
-          let peerIds = await getFriendsPeerIds()
+          let peerIds = await getFriendsList()
 
           yield Array.from(peerIds)
 

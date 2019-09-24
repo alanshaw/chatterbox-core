@@ -1,5 +1,5 @@
 const mortice = require('mortice')
-const Syndicate = require('../lib/feed-manager')
+const Syndicate = require('../lib/syndicate')
 
 module.exports = ({ ipfs, config }) => {
   const getPeersPath = () => `${config.repoDir}/peers`
