@@ -35,10 +35,9 @@ module.exports = ({
         parents: true
       })
 
-      await peers.set(peerId, { lastSeenAt: receivedAt })
+      await peers.set(peerId, { lastMessage: message, lastSeenAt: receivedAt })
 
       syndicate.publish({ action: 'add', id: peerId, message })
-      return message
     } finally {
       release()
     }
