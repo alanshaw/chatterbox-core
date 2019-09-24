@@ -85,7 +85,7 @@ Length limited messages received by a peer. Stored by `receivedAt` in descending
 ### Constructor
 
 ```js
-const cbox = await chatterbox([options])
+const cbox = await chatterbox(ipfs, [options])
 ```
 
 ### `cbox.friends`
