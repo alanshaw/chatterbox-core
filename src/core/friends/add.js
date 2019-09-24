@@ -1,6 +1,6 @@
 const Validate = require('./validate')
 
-module.exports = ({ peers, getMutex, getFriendsList, setFriendsList }) => {
+module.exports = ({ peers, getMutex, getFriendsPeerIds, setFriendsPeerIds, syndicate }) => {
   return async (peerId, details) => {
     Validate.peerId(peerId)
 
@@ -8,7 +8,7 @@ module.exports = ({ peers, getMutex, getFriendsList, setFriendsList }) => {
     const release = await mutex.writeLock()
 
     try {
-      const friends = await getFriendsList()
+      const friends = await getFriendsPeerIds()
 
       await peers.set(peerId, details)
 
@@ -16,7 +16,9 @@ module.exports = ({ peers, getMutex, getFriendsList, setFriendsList }) => {
 
       friends.push(peerId)
 
-      await setFriendsList(friends)
+      await setFriendsPeerIds(friends)
+
+      syndicate.publish({ action: 'add', id: peerId })
     } finally {
       release()
     }

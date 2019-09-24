@@ -5,12 +5,12 @@ module.exports = ({
   ipfs,
   getMutex,
   peerExists,
+  syndicate,
   getProfilePath,
-  pushToFeeds,
   getProfile
 }) => {
   return async (peerId, details) => {
-    Validate.peerID(peerId)
+    Validate.peerId(peerId)
 
     details = details || {}
 
@@ -74,7 +74,7 @@ module.exports = ({
         parents: true
       })
 
-      pushToFeeds({ action, id: profile.id, profile })
+      syndicate.publish({ action, id: profile.id, profile })
     } finally {
       release()
     }

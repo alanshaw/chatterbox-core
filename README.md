@@ -108,42 +108,18 @@ Live updating friend list.
 * `options: Object`
     * `signal: AbortSignal`
 
-Returns `AsyncIterable<Object[]>`
+Returns `AsyncIterable<String[]>`
 
 ```js
-for await (const list of cbox.friends.feed())
-  list.forEach(friend => console.log(friend))
+for await (const friends of cbox.friends.feed())
+  friends.forEach(peerId => console.log(peerId))
 ```
-
-Each friend:
-
-* `id: String`
-* `name: String`
-* `avatar: String`
-* `lastSeenAt: Number`
-* `lastMessage: Object`
-    * `id: String`
-    * `text: String`
-    * `receivedAt: Number`
-    * `readAt: Number`
 
 #### `cbox.friends.list()`
 
 Get the current friends list.
 
-Returns `Promise<Object[]>`
-
-Each friend:
-
-* `id: String`
-* `name: String`
-* `avatar: String`
-* `lastSeenAt: Number`
-* `lastMessage: Object`
-    * `id: String`
-    * `text: String`
-    * `receivedAt: Number`
-    * `readAt: Number`
+Returns `Promise<String[]>`
 
 #### `cbox.friends.remove(peerId)`
 

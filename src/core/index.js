@@ -1,12 +1,14 @@
-const IPFS = require('ipfs')
-
-module.exports = async options => {
+module.exports = async (ipfs, options) => {
   options = options || {}
-  const ipfs = options.ipfs || await IPFS.create(options.ipfsOptions)
+
+  // TODO: setup IPFS to ensure Chatterbox server(s) are in bootstrap
+  // TODO: verify pubsub is enabled in IPFS
+
   const config = { repoDir: '/.chatterbox' }
 
   const peers = require('./peers')({ ipfs, config })
   const profile = require('./profile')({ ipfs, peers, config })
+  const friends = require('./friends')({ ipfs, peers, config })
 
-  return { peers, profile }
+  return { peers, profile, friends }
 }

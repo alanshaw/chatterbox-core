@@ -7,16 +7,7 @@ const keepAlive = require('it-keepalive')
 
 const Yes = () => true
 
-module.exports = ({
-  ipfs,
-  getMutex,
-  peerExists,
-  getPeersPath,
-  getProfilePath,
-  getProfile,
-  addFeed,
-  removeFeed
-}) => {
+module.exports = ({ ipfs, getPeersPath, getProfile, syndicate }) => {
   return options => {
     options = options || {}
     options.filter = options.filter || Yes
@@ -27,7 +18,7 @@ module.exports = ({
       // Stash the pushable for the feed so that any updates
       // that happen while yielding local peer cache are also yielded
       const source = pushable({ writev: true })
-      addFeed(source)
+      syndicate.join(source)
 
       try {
         let peers = []
@@ -45,8 +36,9 @@ module.exports = ({
           }
 
           peers = await map(peers, peerId => getProfile(peerId), { concurrency: 8 })
+          peers = peers.filter(Boolean).filter(options.filter)
 
-          yield peers.filter(options.filter)
+          yield Array.from(peers)
 
           for await (const diffs of source) {
             peers = diffs
@@ -80,7 +72,7 @@ module.exports = ({
           })
         )
       } finally {
-        removeFeed(source)
+        syndicate.leave(source)
       }
     })()
   }

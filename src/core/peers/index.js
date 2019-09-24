@@ -1,4 +1,5 @@
 const mortice = require('mortice')
+const Syndicate = require('../lib/feed-manager')
 
 module.exports = ({ ipfs, config }) => {
   const getPeersPath = () => `${config.repoDir}/peers`
@@ -25,17 +26,24 @@ module.exports = ({ ipfs, config }) => {
     }
   }
 
-  let feeds = []
+  const syndicate = Syndicate()
+  const getProfile = require('./get')({ ipfs, getProfilePath })
 
-  const addFeed = source => feeds.push(source)
-  const removeFeed = source => { feeds = feeds.filter(s => s !== source) }
-  const pushToFeeds = diff => feeds.forEach(feed => feed.push(diff))
-
-  const commonOptions = { ipfs, getMutex, peerExists, getProfilePath }
-
-  const get = require('./get')({ ...commonOptions })
-  const set = require('./set')({ ...commonOptions, pushToFeeds, getProfile: get })
-  const feed = require('./feed')({ ...commonOptions, getPeersPath, getProfile: get, addFeed, removeFeed })
-
-  return { get, set, feed }
+  return {
+    get: getProfile,
+    set: require('./set')({
+      ipfs,
+      getMutex,
+      peerExists,
+      syndicate,
+      getProfilePath,
+      getProfile
+    }),
+    feed: require('./feed')({
+      ipfs,
+      getPeersPath,
+      getProfile,
+      syndicate
+    })
+  }
 }

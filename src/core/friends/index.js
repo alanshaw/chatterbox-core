@@ -1,12 +1,13 @@
 const { Buffer } = require('buffer')
 const mortice = require('mortice')
+const Syndicate = require('../lib/syndicate')
 
 module.exports = ({ ipfs, peers, config }) => {
   const getFriendsPath = () => `${config.repoDir}/friends.json`
   const mutex = mortice(getFriendsPath())
   const getMutex = () => mutex
 
-  const getFriendsList = () => {
+  const getFriendsPeerIds = () => {
     try {
       return ipfs.files.read(getFriendsPath())
     } catch (err) {
@@ -17,7 +18,7 @@ module.exports = ({ ipfs, peers, config }) => {
     }
   }
 
-  const setFriendsList = friends => {
+  const setFriendsPeerIds = friends => {
     const data = Buffer.from(JSON.stringify(friends))
     return ipfs.files.write(getFriendsPath(), data, {
       create: true,
@@ -25,9 +26,13 @@ module.exports = ({ ipfs, peers, config }) => {
     })
   }
 
-  const add = require('./add')({ peers, getMutex, getFriendsList, setFriendsList })
-  const remove = require('./remove')({ getMutex, getFriendsList, setFriendsList })
-  const list = require('./list')({ peers, getMutex, getFriendsList })
+  const syndicate = Syndicate()
+
+
+  const add = require('./add')({ peers, getMutex, getFriendsPeerIds, setFriendsPeerIds, syndicate })
+  const remove = require('./remove')({ getMutex, getFriendsPeerIds, setFriendsPeerIds, syndicate })
+  const list = require('./list')({ peers, getMutex, getFriendsPeerIds })
+  const feed = require('./feed')({ peers, getMutex, syndicate })
 
   return { add, remove, list }
 }

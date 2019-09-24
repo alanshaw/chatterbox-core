@@ -1,20 +1,17 @@
 const Validate = require('./validate')
 
-module.exports = ({ ipfs, getMutex, peerExists, getProfilePath }) => {
+module.exports = ({ ipfs, getProfilePath }) => {
   return async peerId => {
-    Validate.peerID(peerId)
-
-    const mutex = getMutex(peerId)
-    const release = await mutex.readLock()
+    Validate.peerId(peerId)
 
     try {
-      const exists = await peerExists(peerId)
-      if (!exists) return null
-
       const data = await ipfs.files.read(getProfilePath(peerId))
       return JSON.parse(data)
-    } finally {
-      release()
+    } catch (err) {
+      if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
+        return false
+      }
+      throw err
     }
   }
 }
