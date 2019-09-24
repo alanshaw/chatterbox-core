@@ -1,3 +1,9 @@
+exports.peerId = peerId => {
+  if (typeof peerId !== 'string' || !peerId) {
+    throw new Error('invalid peer ID')
+  }
+}
+
 exports.name = name => {
   if (typeof name !== 'string' || !name) {
     throw new Error('invalid name')
