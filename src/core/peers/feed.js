@@ -7,7 +7,7 @@ const keepAlive = require('it-keepalive')
 
 const Yes = () => true
 
-module.exports = ({ ipfs, getPeersPath, getProfile, syndicate }) => {
+module.exports = ({ ipfs, peersPath, getProfile, syndicate }) => {
   return options => {
     options = options || {}
     options.filter = options.filter || Yes
@@ -26,7 +26,7 @@ module.exports = ({ ipfs, getPeersPath, getProfile, syndicate }) => {
         const updater = source => (async function * () {
           // Yield local peer cache first
           try {
-            peers = await ipfs.files.ls(getPeersPath())
+            peers = await ipfs.files.ls(peersPath)
           } catch (err) {
             if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
               peers = []

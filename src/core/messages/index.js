@@ -1,19 +1,11 @@
-const mortice = require('mortice')
 const log = require('debug')('chatterbox:messages')
 const Syndicate = require('../lib/syndicate')
+const Peers = require('../peers')
 
-module.exports = ({ ipfs, peers, friends, config }) => {
-  const getPeersPath = () => `${config.repoDir}/peers`
-  const getPeerPath = peerId => `${getPeersPath()}/${peerId}`
+const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
+  const peersPath = `${config.repoDir}/peers`
+  const getPeerPath = peerId => `${peersPath}/${peerId}`
   const getMessagesPath = peerId => `${getPeerPath(peerId)}/messages.json`
-
-  const getMutex = (() => {
-    const lockers = {}
-    return peerId => {
-      lockers[peerId] = lockers[peerId] || mortice(getMessagesPath(peerId))
-      return lockers[peerId]
-    }
-  })()
 
   const getMessagesList = peerId => {
     try {
@@ -29,16 +21,19 @@ module.exports = ({ ipfs, peers, friends, config }) => {
 
   const syndicate = Syndicate()
 
-  const addMessage = require('./add')({
-    ipfs,
-    peers,
-    friends,
-    syndicate,
-    getMutex,
-    getMessagesPath,
-    getMessagesList,
-    messageHistorySize: config.messageHistorySize
-  })
+  const addMessage = Peers.withPeerMutex(
+    mutexManager,
+    require('./add')({
+      ipfs,
+      peers,
+      friends,
+      syndicate,
+      getMessagesPath,
+      getMessagesList,
+      friendsMessageHistorySize: config.friendsMessageHistorySize
+    }),
+    'writeLock'
+  )
 
   const onBroadcastMessage = async msg => {
     const id = msg.seqno.toString('hex')
@@ -54,7 +49,7 @@ module.exports = ({ ipfs, peers, friends, config }) => {
     try {
       await addMessage(peerId, id, chatMsg.text)
     } catch (err) {
-      return log('failed to add message %s from %s', id, peerId, chatMsg.text, err)
+      return log('failed to add message %s from %s', id, peerId, chatMsg && chatMsg.text, err)
     }
   }
 
@@ -70,6 +65,8 @@ module.exports = ({ ipfs, peers, friends, config }) => {
   subscribeBroadcast()
 
   return {
-    list: getMessagesList
+    list: Peers.withPeerMutex(mutexManager, getMessagesList, 'readLock')
   }
 }
+
+module.exports = Messages
