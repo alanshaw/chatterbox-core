@@ -24,12 +24,17 @@ module.exports = ({
 
     if (friendsList.includes(peerId)) {
       messages = messages.concat(message)
-
-      if (messages.length > friendsMessageHistorySize) {
-        messages = messages.slice(1)
-      }
     } else {
-      messages = [message]
+      const { id } = await ipfs.id()
+      if (peerId === id) {
+        messages = messages.concat(message)
+      } else {
+        messages = [message]
+      }
+    }
+
+    if (messages.length > friendsMessageHistorySize) {
+      messages = messages.slice(0, -friendsMessageHistorySize)
     }
 
     const data = Buffer.from(JSON.stringify(messages))
