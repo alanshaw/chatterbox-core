@@ -66,7 +66,7 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
 
   return {
     list: Peers.withPeerMutex(mutexManager, getMessagesList, 'readLock'),
-    read
+    read: Peers.withPeerMutex(mutexManager, read, 'writeLock')
   }
 }
 
