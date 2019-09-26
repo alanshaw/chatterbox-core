@@ -3,6 +3,7 @@ const Profile = require('./profile')
 const Friends = require('./friends')
 const Messages = require('./messages')
 const MutexManager = require('./lib/mutex-manager')
+const Migrator = require('./migrator')
 
 module.exports = async (ipfs, options) => {
   options = options || {}
@@ -22,6 +23,8 @@ module.exports = async (ipfs, options) => {
   }
 
   config.peersPath = `${config.repoDir}/peers`
+
+  await Migrator({ ipfs, repoDir: config.repoDir }).toLatest()
 
   const peers = Peers({ ipfs, mutexManager, config })
   const friends = Friends({ ipfs, mutexManager, peers, config })
