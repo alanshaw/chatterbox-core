@@ -2,7 +2,7 @@ const log = require('debug')('chatterbox:messages')
 const Syndicate = require('../lib/syndicate')
 const Peers = require('../peers')
 
-const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
+const Messages = async ({ ipfs, mutexManager, peers, friends, config }) => {
   const getPeerPath = peerId => `${config.peersPath}/${peerId}`
   const getMessagesPath = peerId => `${getPeerPath(peerId)}/messages.json`
 
@@ -61,16 +61,25 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
     }
   }
 
-  const subscribeBroadcast = () => {
+  const subscribeBroadcast = () => (
     ipfs.pubsub.subscribe(config.topics.broadcast, onBroadcastMessage, {
       onError: (err, fatal) => {
         log('pubsub subscription error', err)
-        if (fatal) setTimeout(subscribeBroadcast, 1000)
+        if (fatal) {
+          setTimeout(async function resub () {
+            try {
+              await subscribeBroadcast()
+            } catch (err) {
+              log('failed to resubscribe', err)
+              setTimeout(resub, 1000)
+            }
+          }, 1000)
+        }
       }
     })
-  }
+  )
 
-  subscribeBroadcast()
+  await subscribeBroadcast()
 
   return {
     list: Peers.withPeerMutex(mutexManager, getMessagesList, 'readLock'),

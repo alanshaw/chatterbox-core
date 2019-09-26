@@ -26,10 +26,10 @@ module.exports = async (ipfs, options) => {
 
   await Migrator({ ipfs, repoDir: config.repoDir }).toLatest()
 
-  const peers = Peers({ ipfs, mutexManager, config })
-  const friends = Friends({ ipfs, mutexManager, peers, config })
-  const profile = Profile({ ipfs, mutexManager, peers, config })
-  const messages = Messages({ ipfs, mutexManager, peers, friends, config })
+  const peers = await Peers({ ipfs, mutexManager, config })
+  const friends = await Friends({ ipfs, mutexManager, peers, config })
+  const profile = await Profile({ ipfs, mutexManager, peers, config })
+  const messages = await Messages({ ipfs, mutexManager, peers, friends, config })
 
   return { peers, friends, profile, messages }
 }
