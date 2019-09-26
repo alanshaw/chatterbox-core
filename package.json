@@ -1,7 +1,7 @@
 {
-  "name": "ipfs-chatterbox-core",
+  "name": "chatterbox-core",
   "version": "0.0.0",
-  "description": "",
+  "description": "The core API for Chatterbox, a messaging application built on IPFS and libp2p.",
   "main": "index.js",
   "scripts": {
     "test": "ava --verbose",

@@ -1,7 +1,7 @@
-# IPFS Chatterbox Core
+# Chatterbox Core
 
-[![Build Status](https://travis-ci.org/alanshaw/ipfs-chatterbox-core.svg?branch=master)](https://travis-ci.org/alanshaw/ipfs-chatterbox-core)
-[![dependencies Status](https://david-dm.org/alanshaw/ipfs-chatterbox-core/status.svg)](https://david-dm.org/alanshaw/ipfs-chatterbox-core)
+[![Build Status](https://travis-ci.org/alanshaw/chatterbox-core.svg?branch=master)](https://travis-ci.org/alanshaw/chatterbox-core)
+[![dependencies Status](https://david-dm.org/alanshaw/chatterbox-core/status.svg)](https://david-dm.org/alanshaw/chatterbox-core)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 > The core API for Chatterbox, a messaging application built on IPFS and libp2p.
@@ -9,13 +9,13 @@
 ## Install
 
 ```sh
-npm install ipfs-chatterbox-core
+npm install chatterbox-core
 ```
 
 ## Usage
 
 ```js
-const Chatterbox = require('ipfs-chatterbox-core')
+const Chatterbox = require('chatterbox-core')
 ```
 
 ## API
@@ -45,7 +45,7 @@ const Chatterbox = require('ipfs-chatterbox-core')
 To create a new chatterbox core instance, await on a call to the factory function that is the default export for the module. Note a "ready" IPFS instance is _required_ with pubsub _enabled_.
 
 ```js
-const Chatterbox = require('ipfs-chatterbox-core')
+const Chatterbox = require('chatterbox-core')
 const cbox = await Chatterbox(ipfs, [options])
 ```
 
@@ -323,7 +323,7 @@ Length limited messages received by a peer. Stored by `receivedAt` in ascending 
 
 ## Contribute
 
-Feel free to dive in! [Open an issue](https://github.com/alanshaw/ipfs-chatterbox-core/issues/new) or submit PRs.
+Feel free to dive in! [Open an issue](https://github.com/alanshaw/chatterbox-core/issues/new) or submit PRs.
 
 ## License
 
