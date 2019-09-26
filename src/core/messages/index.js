@@ -34,6 +34,7 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
     }),
     'writeLock'
   )
+  const broadcast = require('./broadcast')({ ipfs, addMessage, broadcastTopic: config.topics.broadcast })
 
   const onBroadcastMessage = async msg => {
     const id = msg.seqno.toString('hex')
