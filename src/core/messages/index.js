@@ -34,7 +34,11 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
     }),
     'writeLock'
   )
-  const broadcast = require('./broadcast')({ ipfs, addMessage, broadcastTopic: config.topics.broadcast })
+  const broadcast = require('./broadcast')({
+    ipfs,
+    addMessage,
+    broadcastTopic: config.topics.broadcast
+  })
 
   const onBroadcastMessage = async msg => {
     const id = msg.seqno.toString('hex')
@@ -70,7 +74,8 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
 
   return {
     list: Peers.withPeerMutex(mutexManager, getMessagesList, 'readLock'),
-    read: Peers.withPeerMutex(mutexManager, read, 'writeLock')
+    read: Peers.withPeerMutex(mutexManager, read, 'writeLock'),
+    broadcast
   }
 }
 
