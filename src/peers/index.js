@@ -1,46 +1,39 @@
 const Syndicate = require('../lib/syndicate')
+const GetPeerExists = require('./get-peer-exists')
+const GetPeer = require('./get-peer')
+const SetPeer = require('./set-peer')
+const GetPeersFeed = require('./get-peers-feed')
 
 const Peers = ({ ipfs, mutexManager, config }) => {
-  const getPeerPath = peerId => `${config.peersPath}/${peerId}`
-  const getProfilePath = peerId => `${getPeerPath(peerId)}/profile.json`
+  const getPeerPath = peerId => `${config.peersPath}/${peerId}/info.json`
 
-  const peerExists = async peerId => {
-    try {
-      await ipfs.files.stat(getPeerPath(peerId))
-      return true
-    } catch (err) {
-      if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
-        return false
-      }
-      throw err
-    }
-  }
+  const getPeerExists = GetPeerExists({ ipfs, getPeerPath })
 
   const syndicate = Syndicate()
 
-  const get = require('./get')({ ipfs, getProfilePath })
-  const set = require('./set')({
+  const getPeer = GetPeer({ ipfs, getPeerPath })
+  const setPeer = SetPeer({
     ipfs,
-    peerExists,
-    getProfilePath,
-    getProfile: get,
+    getPeerExists,
+    getPeerPath,
+    getPeer,
     syndicate
   })
-  const feed = require('./feed')({
+  const getPeersFeed = GetPeersFeed({
     ipfs,
     peersPath: config.peersPath,
-    getProfile: Peers.withPeerMutex(mutexManager, get, 'readLock'),
+    getPeer: Peers.withPeerMutex(mutexManager, getPeer, 'readLock'),
     syndicate
   })
 
   return {
-    get: Peers.withPeerMutex(mutexManager, get, 'readLock'),
-    set: Peers.withPeerMutex(mutexManager, set, 'writeLock'),
-    feed,
+    get: Peers.withPeerMutex(mutexManager, getPeer, 'readLock'),
+    set: Peers.withPeerMutex(mutexManager, setPeer, 'writeLock'),
+    feed: getPeersFeed,
     // Allow these API calls to be made when a writeLock has already been
     // acquired for the peer.
     __unsafe__: {
-      set
+      set: setPeer
     }
   }
 }

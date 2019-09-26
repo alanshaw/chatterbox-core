@@ -1,29 +1,24 @@
 const log = require('debug')('chatterbox:messages')
 const Syndicate = require('../lib/syndicate')
 const Peers = require('../peers')
+const AddMessage = require('./add-message')
+const GetMessagesList = require('./get-messages-list')
+const SetMessageRead = require('./set-message-read')
+const BroadcastMessage = require('./broadcast-message')
+const GetMessagesFeed = require('./get-messages-feed')
 
 const Messages = async ({ ipfs, mutexManager, peers, friends, config }) => {
   const getPeerPath = peerId => `${config.peersPath}/${peerId}`
   const getMessagesPath = peerId => `${getPeerPath(peerId)}/messages.json`
 
-  const getMessagesList = peerId => {
-    try {
-      const data = ipfs.files.read(getMessagesPath(peerId))
-      return JSON.parse(data)
-    } catch (err) {
-      if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
-        return []
-      }
-      throw err
-    }
-  }
+  const getMessagesList = GetMessagesList({ ipfs, getMessagesPath })
 
   const syndicate = Syndicate()
 
-  const read = require('./read')({ ipfs, getMessagesList, getMessagesPath, syndicate })
+  const setMessageRead = SetMessageRead({ ipfs, getMessagesList, getMessagesPath, syndicate })
   const addMessage = Peers.withPeerMutex(
     mutexManager,
-    require('./add')({
+    AddMessage({
       ipfs,
       peers,
       friends,
@@ -34,12 +29,12 @@ const Messages = async ({ ipfs, mutexManager, peers, friends, config }) => {
     }),
     'writeLock'
   )
-  const broadcast = require('./broadcast')({
+  const broadcastMessage = BroadcastMessage({
     ipfs,
     addMessage,
     broadcastTopic: config.topics.broadcast
   })
-  const feed = require('./feed')({
+  const getMessagesFeed = GetMessagesFeed({
     getMessagesList,
     syndicate
   })
@@ -87,9 +82,9 @@ const Messages = async ({ ipfs, mutexManager, peers, friends, config }) => {
 
   return {
     list: Peers.withPeerMutex(mutexManager, getMessagesList, 'readLock'),
-    read: Peers.withPeerMutex(mutexManager, read, 'writeLock'),
-    broadcast,
-    feed
+    read: Peers.withPeerMutex(mutexManager, setMessageRead, 'writeLock'),
+    broadcast: broadcastMessage,
+    feed: getMessagesFeed
   }
 }
 

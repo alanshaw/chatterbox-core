@@ -31,14 +31,14 @@ const Chatterbox = require('chatterbox-core')
     * [cbox.messages.feed](#cboxmessagesfeedpeerid-options)
     * [cbox.messages.list](#cboxmessageslistpeerid)
     * [cbox.messages.read](#cboxmessagesreadpeerid-messageid)
+* [cbox.peer](#cboxpeer)
+    * [cbox.peer.get](#cboxpeerget)
+    * [cbox.peer.set](#cboxpeersetdetails)
 * [cbox.peers](#cboxpeers)
     * [cbox.peers.feed](#cboxpeersfeedoptions)
     * [cbox.peers.gc](#cboxpeersgcoptions)
     * [cbox.peers.get](#cboxpeersgetpeerid)
     * [cbox.peers.set](#cboxpeerssetpeerid-details)
-* [cbox.profile](#cboxprofile)
-    * [cbox.profile.get](#cboxprofileget)
-    * [cbox.profile.set](#cboxprofilesetdetails)
 
 ### Constructor
 
@@ -154,6 +154,34 @@ Set the `readAt` field for a given message to the current time (if not already s
 Returns `Promise`
 
 
+### `cbox.peer`
+
+#### `cbox.peer.get()`
+
+Get the local peer's info.
+
+* `id: String`
+* `name: String`
+* `avatar: String`
+* `lastSeenAt: Number`
+* `lastMessage: Object`
+    * `text: String`
+    * `receivedAt: Number`
+    * `readAt: Number`
+
+Returns `Promise<Object>`
+
+#### `cbox.peer.set(details)`
+
+Set the peer's info.
+
+* `details: Object`
+    * `name: String`
+    * `avatar: String`
+
+Returns `Promise`
+
+
 ### `cbox.peers`
 
 Information about peers in the chatterbox network.
@@ -229,33 +257,6 @@ Set properties for a peer.
         * `readAt: Number`
 
 
-### `cbox.profile`
-
-#### `cbox.profile.get()`
-
-Get the current user's profile.
-
-* `id: String`
-* `name: String`
-* `avatar: String`
-* `lastSeenAt: Number`
-* `lastMessage: Object`
-    * `text: String`
-    * `receivedAt: Number`
-    * `readAt: Number`
-
-Returns `Promise<Object>`
-
-#### `cbox.profile.set(details)`
-
-Set the current user's profile properties.
-
-* `details: Object`
-    * `name: String`
-    * `url: String`
-
-Returns `Promise`
-
 ## MFS layout
 
 ```
@@ -263,7 +264,7 @@ Returns `Promise`
 ├── friends.json  # Array of Peer IDs
 ├── peers
 |   ├── QmPeer0
-|   |   ├── profile.json   # Peer profile object
+|   |   ├── info.json      # Peer info object
 |   |   └── messages.json  # Array of received messages
 |   ├── QmPeer1
 |   └── QmPeer2
@@ -282,9 +283,9 @@ List of Peer IDs that the user has "made friends" with.
 ]
 ```
 
-### `profile.json`
+### `peers/Qm.../info.json`
 
-Peer profile data. Note that user _is a_ peer so their info is stored here also.
+Peer data.
 
 ```json
 {
@@ -301,7 +302,7 @@ Peer profile data. Note that user _is a_ peer so their info is stored here also.
 }
 ```
 
-### `messages.json`
+### `peers/Qm.../messages.json`
 
 Length limited messages received by a peer. Stored by `receivedAt` in ascending order.
 

@@ -1,7 +1,7 @@
 import test from 'ava'
 import hat from 'hat'
 import defer from 'p-defer'
-import Add from '../../../src/friends/add'
+import AddFriend from '../../../src/friends/add-friend'
 
 test('should validate a passed peer ID', async t => {
   const getFriendsList = () => []
@@ -9,9 +9,9 @@ test('should validate a passed peer ID', async t => {
   const peers = { set: () => {} }
   const syndicate = { publish: () => {} }
 
-  const add = Add({ getFriendsList, setFriendsList, peers, syndicate })
+  const addFriend = AddFriend({ getFriendsList, setFriendsList, peers, syndicate })
 
-  const err = await t.throwsAsync(add(null))
+  const err = await t.throwsAsync(addFriend(null))
 
   t.is(err.message, 'invalid peer ID')
 })
@@ -24,10 +24,10 @@ test('should add a new peer to the friends list', async t => {
   const peers = { set: () => {} }
   const syndicate = { publish: () => {} }
 
-  const add = Add({ getFriendsList, setFriendsList, peers, syndicate })
+  const addFriend = AddFriend({ getFriendsList, setFriendsList, peers, syndicate })
 
   const peerId = hat()
-  await add(peerId)
+  await addFriend(peerId)
 
   t.deepEqual(friends, [peerId])
 })
@@ -41,9 +41,9 @@ test('should not add a new peer if already exists', async t => {
   const peers = { set: () => {} }
   const syndicate = { publish: () => {} }
 
-  const add = Add({ getFriendsList, setFriendsList, peers, syndicate })
+  const addFriend = AddFriend({ getFriendsList, setFriendsList, peers, syndicate })
 
-  await add(peerId)
+  await addFriend(peerId)
 
   t.deepEqual(friends, [peerId])
 })
@@ -56,10 +56,10 @@ test('should publish added peer to syndicate', async t => {
   const peers = { set: () => {} }
   const syndicate = { publish: diff => deferred.resolve(diff) }
 
-  const add = Add({ getFriendsList, setFriendsList, peers, syndicate })
+  const addFriend = AddFriend({ getFriendsList, setFriendsList, peers, syndicate })
 
   const peerId = hat()
-  await add(peerId)
+  await addFriend(peerId)
 
   const diff = await deferred.promise
 

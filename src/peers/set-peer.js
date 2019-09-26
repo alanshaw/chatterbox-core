@@ -3,10 +3,10 @@ const Validate = require('./validate')
 
 module.exports = ({
   ipfs,
-  peerExists,
+  getPeerExists,
   syndicate,
-  getProfilePath,
-  getProfile
+  getPeerPath,
+  getPeer
 }) => {
   return async (peerId, details) => {
     Validate.peerId(peerId)
@@ -29,32 +29,32 @@ module.exports = ({
       Validate.lastMessage(details.lastMessage)
     }
 
-    const exists = await peerExists(peerId)
-    let profile
+    const exists = await getPeerExists(peerId)
+    let peer
     let action
 
     if (exists) {
       action = 'change'
-      profile = await getProfile(peerId)
+      peer = await getPeer(peerId)
 
       if (details.name || details.name === null) {
-        profile.name = details.name
+        peer.name = details.name
       }
 
       if (details.avatar || details.avatar === null) {
-        profile.avatar = details.avatar
+        peer.avatar = details.avatar
       }
 
       if (details.lastSeenAt) {
-        profile.lastSeenAt = details.lastSeenAt
+        peer.lastSeenAt = details.lastSeenAt
       }
 
       if (details.lastMessage) {
-        profile.lastMessage = details.lastMessage
+        peer.lastMessage = details.lastMessage
       }
     } else {
       action = 'add'
-      profile = {
+      peer = {
         id: peerId,
         name: details.name,
         avatar: details.avatar,
@@ -63,12 +63,12 @@ module.exports = ({
       }
     }
 
-    const data = Buffer.from(JSON.stringify(profile))
-    await ipfs.files.write(getProfilePath(peerId), data, {
+    const data = Buffer.from(JSON.stringify(peer))
+    await ipfs.files.write(getPeerPath(peerId), data, {
       create: true,
       parents: true
     })
 
-    syndicate.publish({ action, id: profile.id, profile })
+    syndicate.publish({ action, id: peer.id, peer })
   }
 }

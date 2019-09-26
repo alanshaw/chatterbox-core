@@ -7,7 +7,7 @@ const keepAlive = require('it-keepalive')
 
 const Yes = () => true
 
-module.exports = ({ ipfs, peersPath, getProfile, syndicate }) => {
+module.exports = ({ ipfs, peersPath, getPeer, syndicate }) => {
   return options => {
     options = options || {}
     options.filter = options.filter || Yes
@@ -35,7 +35,7 @@ module.exports = ({ ipfs, peersPath, getProfile, syndicate }) => {
             }
           }
 
-          peers = await map(peers, peerId => getProfile(peerId), { concurrency: 8 })
+          peers = await map(peers, peerId => getPeer(peerId), { concurrency: 8 })
           peers = peers.filter(Boolean).filter(options.filter)
 
           yield Array.from(peers)
@@ -44,9 +44,9 @@ module.exports = ({ ipfs, peersPath, getProfile, syndicate }) => {
             peers = diffs
               .reduce((peers, diff) => {
                 if (diff.action === 'add') {
-                  return peers.concat(diff.profile)
+                  return peers.concat(diff.peer)
                 } else if (diff.action === 'change') {
-                  return peers.map(p => p.id === diff.id ? diff.profile : p)
+                  return peers.map(p => p.id === diff.id ? diff.peer : p)
                 } else if (diff.action === 'remove') {
                   return peers.filter(p => p.id !== diff.id)
                 } else {

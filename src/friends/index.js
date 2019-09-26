@@ -1,43 +1,30 @@
-const { Buffer } = require('buffer')
 const Syndicate = require('../lib/syndicate')
+const AddFriend = require('./add-friend')
+const RemoveFriend = require('./remove-friend')
+const GetFriendsList = require('./get-friends-list')
+const SetFriendsList = require('./set-friends-list')
+const GetFriendsFeed = require('./get-friends-feed')
 
 const Friends = ({ ipfs, mutexManager, peers, config }) => {
   const friendsPath = `${config.repoDir}/friends.json`
 
-  const getFriendsList = async () => {
-    try {
-      const data = await ipfs.files.read(friendsPath)
-      return JSON.parse(data)
-    } catch (err) {
-      if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
-        return []
-      }
-      throw err
-    }
-  }
-
-  const setFriendsList = friends => {
-    const data = Buffer.from(JSON.stringify(friends))
-    return ipfs.files.write(friendsPath, data, {
-      create: true,
-      parents: true
-    })
-  }
+  const getFriendsList = GetFriendsList({ ipfs, friendsPath })
+  const setFriendsList = SetFriendsList({ ipfs, friendsPath })
 
   const syndicate = Syndicate()
 
-  const add = require('./add')({ peers, getFriendsList, setFriendsList, syndicate })
-  const remove = require('./remove')({ getFriendsList, setFriendsList, syndicate })
-  const feed = require('./feed')({
+  const addFriend = AddFriend({ peers, getFriendsList, setFriendsList, syndicate })
+  const removeFriend = RemoveFriend({ getFriendsList, setFriendsList, syndicate })
+  const getFriendsFeed = GetFriendsFeed({
     getFriendsList: Friends.withFriendsMutex(mutexManager, getFriendsList, 'readLock'),
     syndicate
   })
 
   return {
-    add: Friends.withFriendsMutex(mutexManager, add, 'writeLock'),
-    remove: Friends.withFriendsMutex(mutexManager, remove, 'writeLock'),
+    add: Friends.withFriendsMutex(mutexManager, addFriend, 'writeLock'),
+    remove: Friends.withFriendsMutex(mutexManager, removeFriend, 'writeLock'),
     list: Friends.withFriendsMutex(mutexManager, getFriendsList, 'readLock'),
-    feed
+    feed: getFriendsFeed
   }
 }
 

@@ -1,5 +1,5 @@
 const Peers = require('./peers')
-const Profile = require('./profile')
+const Peer = require('./peer')
 const Friends = require('./friends')
 const Messages = require('./messages')
 const MutexManager = require('./lib/mutex-manager')
@@ -28,8 +28,8 @@ module.exports = async (ipfs, options) => {
 
   const peers = await Peers({ ipfs, mutexManager, config })
   const friends = await Friends({ ipfs, mutexManager, peers, config })
-  const profile = await Profile({ ipfs, mutexManager, peers, config })
+  const peer = await Peer({ ipfs, mutexManager, peers, config })
   const messages = await Messages({ ipfs, mutexManager, peers, friends, config })
 
-  return { peers, friends, profile, messages }
+  return { peers, friends, peer, messages }
 }
