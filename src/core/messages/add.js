@@ -19,7 +19,7 @@ module.exports = ({
     const receivedAt = Date.now()
     const message = { id: messageId, text, receivedAt }
 
-    let messages = await getMessagesList()
+    let messages = await getMessagesList(peerId)
     const friendsList = await friends.list()
 
     if (friendsList.includes(peerId)) {
