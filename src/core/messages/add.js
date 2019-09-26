@@ -1,4 +1,5 @@
 const { Buffer } = require('buffer')
+const hat = require('hat')
 const Validate = require('./validate')
 
 module.exports = ({
@@ -10,13 +11,14 @@ module.exports = ({
   getMessagesList,
   friendsMessageHistorySize
 }) => {
-  return async (peerId, messageId, text) => {
+  return async (peerId, text) => {
     Validate.peerId(peerId)
-    Validate.messageId(messageId)
     Validate.text(text)
 
+    const messageId = hat()
     const receivedAt = Date.now()
     const message = { id: messageId, text, receivedAt }
+
     let messages = await getMessagesList()
     const friendsList = await friends.list()
 

@@ -39,6 +39,9 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
     const id = msg.seqno.toString('hex')
     const peerId = msg.from
 
+    const { id: nodeId } = await ipfs.id()
+    if (peerId === nodeId) return
+
     let chatMsg
     try {
       chatMsg = JSON.parse(msg.data)
@@ -47,9 +50,9 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
     }
 
     try {
-      await addMessage(peerId, id, chatMsg.text)
+      await addMessage(peerId, chatMsg.text)
     } catch (err) {
-      return log('failed to add message %s from %s', id, peerId, chatMsg && chatMsg.text, err)
+      return log('failed to add message %s from %s', id, peerId, chatMsg, err)
     }
   }
 
