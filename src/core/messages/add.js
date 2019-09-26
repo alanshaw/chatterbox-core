@@ -33,7 +33,10 @@ module.exports = ({
       }
     }
 
+    let removedMessages = []
+
     if (messages.length > friendsMessageHistorySize) {
+      removedMessages = messages.slice(0, messages.length - friendsMessageHistorySize)
       messages = messages.slice(0, -friendsMessageHistorySize)
     }
 
@@ -47,5 +50,9 @@ module.exports = ({
     await peers.__unsafe__.set(peerId, { lastMessage: message, lastSeenAt: receivedAt })
 
     syndicate.publish({ action: 'add', peerId, messageId, message })
+
+    removedMessages.forEach(m => {
+      syndicate.publish({ action: 'remove', peerId, messageId: m.id })
+    })
   }
 }
