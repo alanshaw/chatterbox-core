@@ -1,66 +1,24 @@
-# IPFS Chatterbox
+# IPFS Chatterbox Core
 
-## MFS layout
+[![Build Status](https://travis-ci.org/alanshaw/ipfs-chatterbox-core.svg?branch=master)](https://travis-ci.org/alanshaw/ipfs-chatterbox-core)
+[![dependencies Status](https://david-dm.org/alanshaw/ipfs-chatterbox-core/status.svg)](https://david-dm.org/alanshaw/ipfs-chatterbox-core)
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-```
-/.chatterbox
-├── friends.json  # Array of Peer IDs
-├── peers
-|   ├── QmPeer0
-|   |   ├── profile.json   # Peer profile object
-|   |   └── messages.json  # Array of received messages
-|   ├── QmPeer1
-|   └── QmPeer2
-└── version.json  # Data store layout version
+> The core API for Chatterbox, a messaging application built on IPFS and libp2p.
+
+## Install
+
+```sh
+npm install ipfs-chatterbox-core
 ```
 
-### `friends.json`
+## Usage
 
-List of Peer IDs that the user has "made friends" with.
-
-```json
-[
-  "QmFriend0",
-  "QmFriend1",
-  "QmFriend2"
-]
+```js
+const Chatterbox = require('ipfs-chatterbox-core')
 ```
 
-### `profile.json`
-
-Peer profile data. Note that user _is a_ peer so their info is stored here also.
-
-```json
-{
-  "id": "QmPeerId",
-  "name": "Dave",
-  "avatar": "http://ipfs.io/ipfs/QmAvatar",
-  "lastSeenAt": 1568883407737,
-  "lastMessage": {
-    "id": "HexMessageId",
-    "text": "Hello World!",
-    "receivedAt": 1568883407737,
-    "readAt": 1568883407737
-  }
-}
-```
-
-### `messages.json`
-
-Length limited messages received by a peer. Stored by `receivedAt` in ascending order.
-
-```json
-[
-  {
-    "id": "HexMessageId",
-    "text": "Hello World!",
-    "receivedAt": 1568883407737,
-    "readAt": 1568883407737
-  }
-]
-```
-
-## Core API
+## API
 
 * [Constructor](#constructor)
 * [cbox.friends](#cboxfriends)
@@ -84,9 +42,20 @@ Length limited messages received by a peer. Stored by `receivedAt` in ascending 
 
 ### Constructor
 
+To create a new chatterbox core instance, await on a call to the factory function that is the default export for the module. Note a "ready" IPFS instance is _required_ with pubsub _enabled_.
+
 ```js
-const cbox = await chatterbox(ipfs, [options])
+const Chatterbox = require('ipfs-chatterbox-core')
+const cbox = await Chatterbox(ipfs, [options])
 ```
+
+* `ipfs: IPFS`
+* `options: Object`
+    * `repoDir: String` (default `/.chatterbox`)
+    * `topics: Object`
+        * `broadcast: String` (default `/chatterbox/broadcast/1.0.0`)
+        * `beacon: String` (default `/chatterbox/beacon/1.0.0`)
+    * `friendsMessageHistorySize: Number` (default `1000`)
 
 ### `cbox.friends`
 
@@ -287,7 +256,75 @@ Set the current user's profile properties.
 
 Returns `Promise`
 
+## MFS layout
+
+```
+/.chatterbox
+├── friends.json  # Array of Peer IDs
+├── peers
+|   ├── QmPeer0
+|   |   ├── profile.json   # Peer profile object
+|   |   └── messages.json  # Array of received messages
+|   ├── QmPeer1
+|   └── QmPeer2
+└── version.json  # Data store layout version
+```
+
+### `friends.json`
+
+List of Peer IDs that the user has "made friends" with.
+
+```json
+[
+  "QmFriend0",
+  "QmFriend1",
+  "QmFriend2"
+]
+```
+
+### `profile.json`
+
+Peer profile data. Note that user _is a_ peer so their info is stored here also.
+
+```json
+{
+  "id": "QmPeerId",
+  "name": "Dave",
+  "avatar": "http://ipfs.io/ipfs/QmAvatar",
+  "lastSeenAt": 1568883407737,
+  "lastMessage": {
+    "id": "HexMessageId",
+    "text": "Hello World!",
+    "receivedAt": 1568883407737,
+    "readAt": 1568883407737
+  }
+}
+```
+
+### `messages.json`
+
+Length limited messages received by a peer. Stored by `receivedAt` in ascending order.
+
+```json
+[
+  {
+    "id": "HexMessageId",
+    "text": "Hello World!",
+    "receivedAt": 1568883407737,
+    "readAt": 1568883407737
+  }
+]
+```
+
 ## Ideas
 
 1. Message index file `messages/index.json` and then per message file as id (`messages/[id].json`) or `receivedAt` time (`messages/1568883407737.json`).
 2. ndjson messages file `messages.ndjson` for streaming
+
+## Contribute
+
+Feel free to dive in! [Open an issue](https://github.com/alanshaw/ipfs-chatterbox-core/issues/new) or submit PRs.
+
+## License
+
+[MIT](LICENSE) © Alan Shaw
