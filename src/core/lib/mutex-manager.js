@@ -1,11 +1,12 @@
 const mortice = require('mortice')
 
 module.exports = () => {
-  const lockers = {}
+  const lockers = new Map()
   return {
     getMutex (key) {
-      lockers[key] = lockers[key] || mortice(key)
-      return lockers[key]
+      if (lockers.has(key)) return lockers.get(key)
+      lockers.set(key, mortice(key))
+      return lockers.get(key)
     }
   }
 }

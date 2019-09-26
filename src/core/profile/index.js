@@ -1,26 +1,13 @@
-const Profile = ({ ipfs, mutexManager, peers }) => {
+const Profile = ({ ipfs, peers }) => {
   const api = {
     async get () {
       const { id } = await ipfs.id()
-      const mutex = mutexManager.getMutex(`/chatterbox/peers/${id}`)
-      const release = await mutex.readLock()
-      try {
-        const profile = await peers.get(id)
-        return profile
-      } finally {
-        release()
-      }
+      return peers.get(id)
     },
 
     async set (details) {
       const { id } = await ipfs.id()
-      const mutex = mutexManager.getMutex(`/chatterbox/peers/${id}`)
-      const release = await mutex.readLock()
-      try {
-        await peers.set(id, details)
-      } finally {
-        release()
-      }
+      await peers.set(id, details)
     }
   }
 

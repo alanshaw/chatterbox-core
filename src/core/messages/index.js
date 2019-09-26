@@ -3,8 +3,7 @@ const Syndicate = require('../lib/syndicate')
 const Peers = require('../peers')
 
 const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
-  const peersPath = `${config.repoDir}/peers`
-  const getPeerPath = peerId => `${peersPath}/${peerId}`
+  const getPeerPath = peerId => `${config.peersPath}/${peerId}`
   const getMessagesPath = peerId => `${getPeerPath(peerId)}/messages.json`
 
   const getMessagesList = peerId => {
@@ -21,6 +20,7 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
 
   const syndicate = Syndicate()
 
+  const read = require('./read')({ ipfs, getMessagesList, getMessagesPath, syndicate })
   const addMessage = Peers.withPeerMutex(
     mutexManager,
     require('./add')({
@@ -65,7 +65,8 @@ const Messages = ({ ipfs, mutexManager, peers, friends, config }) => {
   subscribeBroadcast()
 
   return {
-    list: Peers.withPeerMutex(mutexManager, getMessagesList, 'readLock')
+    list: Peers.withPeerMutex(mutexManager, getMessagesList, 'readLock'),
+    read
   }
 }
 

@@ -39,6 +39,6 @@ module.exports = ({
     // Caller _should_ have already taken a write lock on the peer
     await peers.__unsafe__.set(peerId, { lastMessage: message, lastSeenAt: receivedAt })
 
-    syndicate.publish({ action: 'add', id: peerId, message })
+    syndicate.publish({ action: 'add', peerId, messageId, message })
   }
 }

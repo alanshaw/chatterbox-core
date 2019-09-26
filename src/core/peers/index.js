@@ -1,8 +1,7 @@
 const Syndicate = require('../lib/syndicate')
 
 const Peers = ({ ipfs, mutexManager, config }) => {
-  const peersPath = `${config.repoDir}/peers`
-  const getPeerPath = peerId => `${peersPath}/${peerId}`
+  const getPeerPath = peerId => `${config.peersPath}/${peerId}`
   const getProfilePath = peerId => `${getPeerPath(peerId)}/profile.json`
 
   const peerExists = async peerId => {
@@ -29,7 +28,7 @@ const Peers = ({ ipfs, mutexManager, config }) => {
   })
   const feed = require('./feed')({
     ipfs,
-    peersPath,
+    peersPath: config.peersPath,
     getProfile: Peers.withPeerMutex(mutexManager, get, 'readLock'),
     syndicate
   })
