@@ -2,6 +2,7 @@ const abortable = require('abortable-iterator')
 const { AbortError } = require('abortable-iterator')
 const pushable = require('it-pushable')
 const pipe = require('it-pipe')
+const log = require('debug')('chatterbox-core:friends:feed')
 
 module.exports = ({ getFriendsList, syndicate }) => {
   return options => {
@@ -28,9 +29,9 @@ module.exports = ({ getFriendsList, syndicate }) => {
                   return peerIds.concat(diff.id)
                 } else if (diff.action === 'remove') {
                   return peerIds.filter(id => id !== diff.id)
-                } else {
-                  throw new Error(`unknown action: "${diff.action}"`)
                 }
+                log(`unknown action: "${diff.action}"`)
+                return peerIds
               }, peerIds)
 
             yield Array.from(peerIds)

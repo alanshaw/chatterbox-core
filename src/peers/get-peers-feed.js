@@ -4,6 +4,7 @@ const pushable = require('it-pushable')
 const map = require('p-map')
 const pipe = require('it-pipe')
 const keepAlive = require('it-keepalive')
+const log = require('debug')('chatterbox-core:messages:feed')
 
 const Yes = () => true
 
@@ -49,9 +50,9 @@ module.exports = ({ ipfs, peersPath, getPeer, syndicate }) => {
                   return peers.map(p => p.id === diff.id ? diff.peer : p)
                 } else if (diff.action === 'remove') {
                   return peers.filter(p => p.id !== diff.id)
-                } else {
-                  throw new Error(`unknown action: "${diff.action}"`)
                 }
+                log(`unknown action: "${diff.action}"`)
+                return peers
               }, peers)
               .filter(options.filter)
 

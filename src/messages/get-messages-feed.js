@@ -2,6 +2,7 @@ const abortable = require('abortable-iterator')
 const { AbortError } = require('abortable-iterator')
 const pushable = require('it-pushable')
 const pipe = require('it-pipe')
+const log = require('debug')('chatterbox-core:messages:feed')
 const Validate = require('./validate')
 
 module.exports = ({ getMessagesList, syndicate }) => {
@@ -34,9 +35,9 @@ module.exports = ({ getMessagesList, syndicate }) => {
                 return messages.map(p => p.id === diff.id ? diff.message : p)
               } else if (diff.action === 'remove') {
                 return messages.filter(p => p.id !== diff.id)
-              } else {
-                throw new Error(`unknown action: "${diff.action}"`)
               }
+              log(`unknown action: "${diff.action}"`)
+              return messages
             }, messages)
 
             yield Array.from(messages)
