@@ -8,7 +8,7 @@ module.exports = ({ ipfs, getMessagesList, getMessagesPath, syndicate }) => {
     const messages = await getMessagesList(peerId)
     const message = messages.find(m => m.id === messageId)
 
-    if (!message) return
+    if (!message || message.readAt) return
 
     message.readAt = Date.now()
 
