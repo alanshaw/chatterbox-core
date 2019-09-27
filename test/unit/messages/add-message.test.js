@@ -2,6 +2,8 @@ import test from 'ava'
 import hat from 'hat'
 import AddMessage from '../../../src/messages/add-message'
 
+const fakeMessage = () => ({ id: hat(), text: hat(), receivedAt: Date.now() })
+
 test('should validate passed peer ID', async t => {
   const ipfs = {}
   const peers = {}
@@ -54,11 +56,7 @@ test('should add a message for a peer', async t => {
   const repoDir = `/${Date.now()}`
   const peerId = hat()
   const text = hat()
-  let messages = [{
-    id: hat(),
-    text: hat(),
-    receivedAt: Date.now()
-  }]
+  let messages = [fakeMessage()]
   const friendsList = []
 
   const ipfs = {
@@ -98,11 +96,7 @@ test('should add a message for a friend', async t => {
   const repoDir = `/${Date.now()}`
   const peerId = hat()
   const text = hat()
-  const message = {
-    id: hat(),
-    text: hat(),
-    receivedAt: Date.now()
-  }
+  const message = fakeMessage()
   let messages = [message]
   const friendsList = [peerId]
 
@@ -144,11 +138,7 @@ test('should limit message history for friends', async t => {
   const repoDir = `/${Date.now()}`
   const peerId = hat()
   const text = hat()
-  const message = {
-    id: hat(),
-    text: hat(),
-    receivedAt: Date.now()
-  }
+  const message = fakeMessage()
   let messages = [message]
   const friendsList = [peerId]
 
@@ -189,11 +179,7 @@ test('should add a message from self', async t => {
   const repoDir = `/${Date.now()}`
   const peerId = hat()
   const text = hat()
-  const message = {
-    id: hat(),
-    text: hat(),
-    receivedAt: Date.now()
-  }
+  const message = fakeMessage()
   let messages = [message]
   const friendsList = []
 

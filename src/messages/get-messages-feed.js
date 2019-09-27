@@ -28,19 +28,26 @@ module.exports = ({ getMessagesList, syndicate }) => {
           yield Array.from(messages)
 
           for await (const diffs of source) {
+            const oldMessages = messages
+
             messages = diffs.reduce((messages, diff) => {
+              if (diff.peerId !== peerId) return messages
+
               if (diff.action === 'add') {
                 return messages.concat(diff.message)
               } else if (diff.action === 'change') {
-                return messages.map(p => p.id === diff.id ? diff.message : p)
+                return messages.map(m => m.id === diff.messageId ? diff.message : m)
               } else if (diff.action === 'remove') {
-                return messages.filter(p => p.id !== diff.id)
+                return messages.filter(m => m.id !== diff.messageId)
               }
+
               log(`unknown action: "${diff.action}"`)
               return messages
             }, messages)
 
-            yield Array.from(messages)
+            if (messages !== oldMessages) {
+              yield Array.from(messages)
+            }
           }
         })()
 
