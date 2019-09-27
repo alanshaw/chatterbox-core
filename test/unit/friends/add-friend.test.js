@@ -3,7 +3,7 @@ import hat from 'hat'
 import defer from 'p-defer'
 import AddFriend from '../../../src/friends/add-friend'
 
-test('should validate a passed peer ID', async t => {
+test('should validate passed peer ID', async t => {
   const getFriendsList = () => []
   const setFriendsList = () => {}
   const peers = { set: () => {} }
