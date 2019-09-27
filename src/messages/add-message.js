@@ -13,13 +13,14 @@ module.exports = ({
 }) => {
   return async (peerId, text) => {
     Validate.peerId(peerId)
-    Validate.text(text)
+    Validate.text(text) // TODO: do we need to restrict text size?
 
     const messageId = hat()
     const receivedAt = Date.now()
     const message = { id: messageId, text, receivedAt }
 
     let messages = await getMessagesList(peerId)
+    let removedMessages = []
     const friendsList = await friends.list()
 
     if (friendsList.includes(peerId)) {
@@ -29,15 +30,14 @@ module.exports = ({
       if (peerId === id) {
         messages = messages.concat(message)
       } else {
+        removedMessages = messages
         messages = [message]
       }
     }
 
-    let removedMessages = []
-
     if (messages.length > friendsMessageHistorySize) {
       removedMessages = messages.slice(0, messages.length - friendsMessageHistorySize)
-      messages = messages.slice(0, -friendsMessageHistorySize)
+      messages = messages.slice(-friendsMessageHistorySize)
     }
 
     const data = Buffer.from(JSON.stringify(messages))
