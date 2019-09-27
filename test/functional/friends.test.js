@@ -1,7 +1,7 @@
 import test from 'ava'
 import hat from 'hat'
 import AbortController from 'abort-controller'
-import pause from '../helpers/_pause'
+import { pause } from '../_helpers'
 import MutexManager from '../../src/lib/mutex-manager'
 import Friends from '../../src/friends'
 
