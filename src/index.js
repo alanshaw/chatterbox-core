@@ -4,6 +4,7 @@ const Friends = require('./friends')
 const Messages = require('./messages')
 const MutexManager = require('./lib/mutex-manager')
 const Migrator = require('./migrator')
+const Beacon = require('./beacon')
 
 module.exports = async (ipfs, options) => {
   options = options || {}
@@ -16,10 +17,11 @@ module.exports = async (ipfs, options) => {
   const config = {
     repoDir: options.repoDir || '/.chatterbox',
     topics: options.topics || {
-      broadcast: '/chatterbox/broadcast/1.0.0',
-      beacon: '/chatterbox/beacon/1.0.0'
+      broadcast: '/chatterbox/broadcast',
+      beacon: '/chatterbox/beacon'
     },
-    friendsMessageHistorySize: options.friendsMessageHistorySize || 1000
+    friendsMessageHistorySize: options.friendsMessageHistorySize || 1000,
+    beaconInterval: 5 * 60 * 1000
   }
 
   config.peersPath = `${config.repoDir}/peers`
@@ -30,6 +32,14 @@ module.exports = async (ipfs, options) => {
   const friends = await Friends({ ipfs, mutexManager, peers, config })
   const peer = await Peer({ ipfs, mutexManager, peers, config })
   const messages = await Messages({ ipfs, mutexManager, peers, friends, config })
+  const beacon = await Beacon({ ipfs, peers, peer, config })
 
-  return { peers, friends, peer, messages }
+  const api = { peers, friends, peer, messages }
+
+  return {
+    ...api,
+    destroy: () => Promise.all(
+      [...Object.values(api), beacon].map(o => o._destroy && o._destroy())
+    )
+  }
 }

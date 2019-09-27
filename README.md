@@ -21,6 +21,7 @@ const Chatterbox = require('chatterbox-core')
 ## API
 
 * [Constructor](#constructor)
+* [cbox.destroy](#cboxdestroy)
 * [cbox.friends](#cboxfriends)
     * [cbox.friends.add](#cboxfriendsaddpeerid-details)
     * [cbox.friends.feed](#cboxfriendsfeedoptions)
@@ -53,9 +54,18 @@ const cbox = await Chatterbox(ipfs, [options])
 * `options: Object`
     * `repoDir: String` (default `/.chatterbox`)
     * `topics: Object`
-        * `broadcast: String` (default `/chatterbox/broadcast/1.0.0`)
-        * `beacon: String` (default `/chatterbox/beacon/1.0.0`)
+        * `broadcast: String` (default `/chatterbox/broadcast`)
+        * `beacon: String` (default `/chatterbox/beacon`)
     * `friendsMessageHistorySize: Number` (default `1000`)
+    * `beaconInterval: Number` (default `5 * 60 * 1000`)
+
+
+### `cbox.destroy()`
+
+Destroy the chatterbox instance.
+
+Returns `Promise`
+
 
 ### `cbox.friends`
 
