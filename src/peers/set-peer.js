@@ -3,10 +3,9 @@ const Validate = require('./validate')
 
 module.exports = ({
   ipfs,
-  getPeerExists,
-  syndicate,
   getPeerPath,
-  getPeer
+  getPeer,
+  syndicate
 }) => {
   return async (peerId, details) => {
     Validate.peerId(peerId)
@@ -29,9 +28,19 @@ module.exports = ({
       Validate.lastMessage(details.lastMessage)
     }
 
-    const exists = await getPeerExists(peerId)
-    let peer
-    let action
+    let exists
+    try {
+      await ipfs.files.stat(getPeerPath(peerId))
+      exists = true
+    } catch (err) {
+      if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
+        exists = false
+      } else {
+        throw err
+      }
+    }
+
+    let peer, action
 
     if (exists) {
       action = 'change'

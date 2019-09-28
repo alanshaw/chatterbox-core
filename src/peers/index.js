@@ -1,5 +1,4 @@
 const Syndicate = require('../lib/syndicate')
-const GetPeerExists = require('./get-peer-exists')
 const GetPeer = require('./get-peer')
 const SetPeer = require('./set-peer')
 const GetPeersFeed = require('./get-peers-feed')
@@ -7,18 +6,10 @@ const GetPeersFeed = require('./get-peers-feed')
 const Peers = ({ ipfs, mutexManager, config }) => {
   const getPeerPath = peerId => `${config.peersPath}/${peerId}/info.json`
 
-  const getPeerExists = GetPeerExists({ ipfs, getPeerPath })
-
   const syndicate = Syndicate()
 
   const getPeer = GetPeer({ ipfs, getPeerPath })
-  const setPeer = SetPeer({
-    ipfs,
-    getPeerExists,
-    getPeerPath,
-    getPeer,
-    syndicate
-  })
+  const setPeer = SetPeer({ ipfs, getPeerPath, getPeer, syndicate })
   const getPeersFeed = GetPeersFeed({
     ipfs,
     peersPath: config.peersPath,
