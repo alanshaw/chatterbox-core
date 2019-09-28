@@ -1,12 +1,7 @@
 const { Buffer } = require('buffer')
 const Validate = require('./validate')
 
-module.exports = ({
-  ipfs,
-  getPeerPath,
-  getPeer,
-  syndicate
-}) => {
+module.exports = ({ ipfs, getPeerPath, getPeer, syndicate }) => {
   return async (peerId, details) => {
     Validate.peerId(peerId)
 
