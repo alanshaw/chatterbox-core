@@ -14,6 +14,19 @@ const fakePubsubChatMsg = (from, data) => ({
     : Buffer.from(JSON.stringify({ version: '1.0.0', ...data }))
 })
 
+const collectMessages = async (api, forPeerId, signal) => {
+  let messagesList = []
+  const feed = api.feed(forPeerId, { signal })
+  try {
+    for await (const list of feed) {
+      messagesList = list
+    }
+  } catch (err) {
+    if (err.type !== 'aborted') throw err
+  }
+  return messagesList
+}
+
 test('should broadcast and receive messages', async t => {
   const peersPath = `/TEST-${Date.now()}/peers`
   const broadcastTopic = `/test/broadcast/${Date.now()}`
@@ -70,22 +83,9 @@ test('should broadcast and receive messages', async t => {
   const externalPeerId = hat()
   const externalMessages = [hat(), hat(), hat()]
 
-  const collectMessages = async forPeerId => {
-    let messagesList = []
-    const feed = messages.feed(forPeerId, { signal: controller.signal })
-    try {
-      for await (const list of feed) {
-        messagesList = list
-      }
-    } catch (err) {
-      t.is(err.type, 'aborted')
-    }
-    return messagesList
-  }
-
   const [ownFeedMessages, externalFeedMessages] = await Promise.all([
-    collectMessages(ownPeerId),
-    collectMessages(externalPeerId),
+    collectMessages(messages, ownPeerId, controller.signal),
+    collectMessages(messages, externalPeerId, controller.signal),
     (async () => {
       const handler = await subscribed.promise
 
@@ -162,23 +162,10 @@ test('should ignore invalid messages', async t => {
 
   const controller = new AbortController()
 
-  const collectMessages = async forPeerId => {
-    let messagesList = []
-    const feed = messages.feed(forPeerId, { signal: controller.signal })
-    try {
-      for await (const list of feed) {
-        messagesList = list
-      }
-    } catch (err) {
-      t.is(err.type, 'aborted')
-    }
-    return messagesList
-  }
-
   const badActorPeerId = hat()
 
   const [badActorFeedMessages] = await Promise.all([
-    collectMessages(badActorPeerId),
+    collectMessages(messages, badActorPeerId, controller.signal),
     (async () => {
       const handler = await subscribed.promise
       const badMessages = [
