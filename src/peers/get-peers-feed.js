@@ -8,7 +8,7 @@ const log = require('debug')('chatterbox-core:messages:feed')
 
 const Yes = () => true
 
-module.exports = ({ ipfs, peersPath, getPeer, syndicate }) => {
+module.exports = ({ ipfs, peersPath, getPeerInfo, syndicate }) => {
   return options => {
     options = options || {}
     options.filter = options.filter || Yes
@@ -36,7 +36,7 @@ module.exports = ({ ipfs, peersPath, getPeer, syndicate }) => {
             }
           }
 
-          peers = await map(peers, peerId => getPeer(peerId), { concurrency: 8 })
+          peers = await map(peers, peerId => getPeerInfo(peerId), { concurrency: 8 })
           peers = peers.filter(Boolean).filter(options.filter)
 
           yield Array.from(peers)
@@ -45,9 +45,9 @@ module.exports = ({ ipfs, peersPath, getPeer, syndicate }) => {
             peers = diffs
               .reduce((peers, diff) => {
                 if (diff.action === 'add') {
-                  return peers.concat(diff.peer)
+                  return peers.concat(diff.peerInfo)
                 } else if (diff.action === 'change') {
-                  return peers.map(p => p.id === diff.id ? diff.peer : p)
+                  return peers.map(p => p.id === diff.id ? diff.peerInfo : p)
                 } else if (diff.action === 'remove') {
                   return peers.filter(p => p.id !== diff.id)
                 }

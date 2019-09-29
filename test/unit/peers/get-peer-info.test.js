@@ -1,10 +1,10 @@
 import test from 'ava'
 import hat from 'hat'
-import GetPeer from '../../../src/peers/get-peer'
+import GetPeerInfo from '../../../src/peers/get-peer-info'
 
 test('should validate a passed peer ID', async t => {
-  const getPeer = GetPeer({ ipfs: {}, getPeerPath: () => {} })
-  const err = await t.throwsAsync(getPeer(null))
+  const getPeerInfo = GetPeerInfo({ ipfs: {}, getPeerInfoPath: () => {} })
+  const err = await t.throwsAsync(getPeerInfo(null))
   t.is(err.message, 'invalid peer ID')
 })
 
@@ -12,7 +12,7 @@ test('should retrieve and parse data from correct path', async t => {
   const repoDir = `/${Date.now()}`
   const peerId = hat()
 
-  const getPeerPath = peerId => `${repoDir}/${peerId}/info.json`
+  const getPeerInfoPath = peerId => `${repoDir}/${peerId}/info.json`
   const peerInfo = {
     id: hat(),
     name: hat(),
@@ -28,15 +28,15 @@ test('should retrieve and parse data from correct path', async t => {
   const ipfs = {
     files: {
       read: path => {
-        t.is(path, getPeerPath(peerId))
+        t.is(path, getPeerInfoPath(peerId))
         return Buffer.from(JSON.stringify(peerInfo))
       }
     }
   }
 
-  const getPeer = GetPeer({ ipfs, getPeerPath })
+  const getPeerInfo = GetPeerInfo({ ipfs, getPeerInfoPath })
 
-  const peer = await getPeer(peerId)
+  const peer = await getPeerInfo(peerId)
 
   t.deepEqual(peer, peerInfo)
 })
@@ -45,7 +45,7 @@ test('should return null when peer does not exist', async t => {
   const repoDir = `/${Date.now()}`
   const peerId = hat()
 
-  const getPeerPath = peerId => `${repoDir}/${peerId}/info.json`
+  const getPeerInfoPath = peerId => `${repoDir}/${peerId}/info.json`
 
   const ipfs = {
     files: {
@@ -55,9 +55,9 @@ test('should return null when peer does not exist', async t => {
     }
   }
 
-  const getPeer = GetPeer({ ipfs, getPeerPath })
+  const getPeerInfo = GetPeerInfo({ ipfs, getPeerInfoPath })
 
-  const peer = await getPeer(peerId)
+  const peer = await getPeerInfo(peerId)
 
   t.is(peer, null)
 })
@@ -66,7 +66,7 @@ test('should throw on read error', async t => {
   const repoDir = `/${Date.now()}`
   const peerId = hat()
 
-  const getPeerPath = peerId => `${repoDir}/${peerId}/info.json`
+  const getPeerInfoPath = peerId => `${repoDir}/${peerId}/info.json`
 
   const ipfs = {
     files: {
@@ -76,9 +76,9 @@ test('should throw on read error', async t => {
     }
   }
 
-  const getPeer = GetPeer({ ipfs, getPeerPath })
+  const getPeerInfo = GetPeerInfo({ ipfs, getPeerInfoPath })
 
-  const err = await t.throwsAsync(getPeer(peerId))
+  const err = await t.throwsAsync(getPeerInfo(peerId))
 
   t.is(err.message, 'boom')
 })

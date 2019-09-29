@@ -1,7 +1,7 @@
 const { Buffer } = require('buffer')
 const Validate = require('./validate')
 
-module.exports = ({ ipfs, getPeerPath, getPeer, syndicate }) => {
+module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
   return async (peerId, details) => {
     Validate.peerId(peerId)
 
@@ -15,17 +15,17 @@ module.exports = ({ ipfs, getPeerPath, getPeer, syndicate }) => {
       Validate.avatar(details.avatar)
     }
 
-    if (details.lastSeenAt != null) {
+    if (details.lastSeenAt !== undefined) {
       Validate.lastSeenAt(details.lastSeenAt)
     }
 
-    if (details.lastMessage != null) {
+    if (details.lastMessage !== undefined) {
       Validate.lastMessage(details.lastMessage)
     }
 
     let exists
     try {
-      await ipfs.files.stat(getPeerPath(peerId))
+      await ipfs.files.stat(getPeerInfoPath(peerId))
       exists = true
     } catch (err) {
       if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
@@ -35,30 +35,30 @@ module.exports = ({ ipfs, getPeerPath, getPeer, syndicate }) => {
       }
     }
 
-    let peer, action
+    let peerInfo, action
 
     if (exists) {
       action = 'change'
-      peer = await getPeer(peerId)
+      peerInfo = await getPeerInfo(peerId)
 
       if (details.name || details.name === null) {
-        peer.name = details.name
+        peerInfo.name = details.name
       }
 
       if (details.avatar || details.avatar === null) {
-        peer.avatar = details.avatar
+        peerInfo.avatar = details.avatar
       }
 
       if (details.lastSeenAt) {
-        peer.lastSeenAt = details.lastSeenAt
+        peerInfo.lastSeenAt = details.lastSeenAt
       }
 
       if (details.lastMessage) {
-        peer.lastMessage = details.lastMessage
+        peerInfo.lastMessage = details.lastMessage
       }
     } else {
       action = 'add'
-      peer = {
+      peerInfo = {
         id: peerId,
         name: details.name,
         avatar: details.avatar,
@@ -67,12 +67,12 @@ module.exports = ({ ipfs, getPeerPath, getPeer, syndicate }) => {
       }
     }
 
-    const data = Buffer.from(JSON.stringify(peer))
-    await ipfs.files.write(getPeerPath(peerId), data, {
+    const data = Buffer.from(JSON.stringify(peerInfo))
+    await ipfs.files.write(getPeerInfoPath(peerId), data, {
       create: true,
       parents: true
     })
 
-    syndicate.publish({ action, id: peer.id, peer })
+    syndicate.publish({ action, id: peerInfo.id, peerInfo })
   }
 }
