@@ -24,6 +24,7 @@ const Peers = ({ ipfs, mutexManager, config }) => {
     // Allow these API calls to be made when a writeLock has already been
     // acquired for the peer.
     __unsafe__: {
+      get: getPeer,
       set: setPeer
     }
   }

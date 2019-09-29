@@ -1,6 +1,6 @@
 const Validate = require('./validate')
 
-module.exports = ({ ipfs, getMessagesList, getMessagesPath, syndicate }) => {
+module.exports = ({ ipfs, peers, getMessagesList, getMessagesPath, syndicate }) => {
   return async (peerId, messageId) => {
     Validate.peerId(peerId)
     Validate.messageId(messageId)
@@ -14,6 +14,14 @@ module.exports = ({ ipfs, getMessagesList, getMessagesPath, syndicate }) => {
 
     const data = Buffer.from(JSON.stringify(messages))
     await ipfs.files.write(getMessagesPath(peerId), data)
+
+    const peer = await peers.__unsafe__.get(peerId)
+
+    if (peer && peer.lastMessage && peer.lastMessage.id === messageId) {
+      await peers.__unsafe__.set(peerId, {
+        lastMessage: { ...peer.lastMessage, readAt: message.readAt }
+      })
+    }
 
     syndicate.publish({ action: 'change', peerId, messageId, message })
   }
