@@ -25,7 +25,6 @@ const Chatterbox = require('chatterbox-core')
 * [cbox.friends](#cboxfriends)
     * [cbox.friends.add](#cboxfriendsaddpeerid-details)
     * [cbox.friends.feed](#cboxfriendsfeedoptions)
-    * [cbox.friends.list](#cboxfriendslist)
     * [cbox.friends.remove](#cboxfriendsremovepeerid)
 * [cbox.messages](#cboxmessages)
     * [cbox.messages.broadcast](#cboxmessagesbroadcasttext)
@@ -82,23 +81,18 @@ Returns `Promise`
 
 #### `cbox.friends.feed([options])`
 
-Live updating friend list.
+Live updating friend list. Same output as [cbox.peers.feed](#cboxpeersfeedoptions) except all peers are friends.
 
 * `options: Object`
     * `signal: AbortSignal`
+    * `filter: Function`
 
-Returns `AsyncIterable<String[]>`
+Returns `AsyncIterable<Object[]>`
 
 ```js
 for await (const friends of cbox.friends.feed())
-  friends.forEach(peerId => console.log(peerId))
+  friends.forEach(peerInfo => console.log(peerInfo))
 ```
-
-#### `cbox.friends.list()`
-
-Get the current friends list.
-
-Returns `Promise<String[]>`
 
 #### `cbox.friends.remove(peerId)`
 
@@ -208,10 +202,10 @@ Returns `AsyncIterable<Object[]>`
 
 ```js
 for await (const list of cbox.peers.feed())
-  list.forEach(peer => console.log(peerId))
+  list.forEach(peerInfo => console.log(peerInfo))
 ```
 
-Each peerId:
+Each peer info:
 
 * `id: String`
 * `name: String`

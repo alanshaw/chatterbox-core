@@ -23,6 +23,10 @@ module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
       Validate.lastMessage(details.lastMessage)
     }
 
+    if (details.isFriend !== undefined) {
+      Validate.isFriend(details.isFriend)
+    }
+
     let exists
     try {
       await ipfs.files.stat(getPeerInfoPath(peerId))
@@ -56,6 +60,10 @@ module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
       if (details.lastMessage) {
         peerInfo.lastMessage = details.lastMessage
       }
+
+      if (details.isFriend != null) {
+        peerInfo.isFriend = details.isFriend
+      }
     } else {
       action = 'add'
       peerInfo = {
@@ -63,7 +71,8 @@ module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
         name: details.name,
         avatar: details.avatar,
         lastSeenAt: details.lastSeenAt,
-        lastMessage: details.lastMessage
+        lastMessage: details.lastMessage,
+        isFriend: details.isFriend || false
       }
     }
 

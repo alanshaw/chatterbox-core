@@ -5,7 +5,6 @@ const Validate = require('./validate')
 module.exports = ({
   ipfs,
   peers,
-  friends,
   syndicate,
   getMessagesPath,
   getMessagesList,
@@ -21,9 +20,10 @@ module.exports = ({
 
     let messages = await getMessagesList(peerId)
     let removedMessages = []
-    const friendsList = await friends.list()
 
-    if (friendsList.includes(peerId)) {
+    const peerInfo = await peers.__unsafe__.get(peerId)
+
+    if (peerInfo && peerInfo.isFriend) {
       messages = messages.concat(message)
     } else {
       const { id } = await ipfs.id()

@@ -9,7 +9,7 @@ const GetMessagesFeed = require('./get-messages-feed')
 
 const VERSION = '1.0.0'
 
-const Messages = async ({ ipfs, mutexManager, peers, friends, config }) => {
+const Messages = async ({ ipfs, mutexManager, peers, config }) => {
   const getPeerPath = peerId => `${config.peersPath}/${peerId}`
   const getMessagesPath = peerId => `${getPeerPath(peerId)}/messages.json`
 
@@ -23,7 +23,6 @@ const Messages = async ({ ipfs, mutexManager, peers, friends, config }) => {
     AddMessage({
       ipfs,
       peers,
-      friends,
       syndicate,
       getMessagesPath,
       getMessagesList,

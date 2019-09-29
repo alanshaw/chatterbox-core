@@ -43,3 +43,9 @@ exports.lastMessage = msg => {
     throw new Error('invalid message read time')
   }
 }
+
+exports.isFriend = isFriend => {
+  if (isFriend !== true && isFriend !== false) {
+    throw new Error('invalid friend flag')
+  }
+}

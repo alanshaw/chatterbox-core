@@ -7,7 +7,6 @@ const fakeMessage = () => ({ id: hat(), text: hat(), receivedAt: Date.now() })
 test('should validate passed peer ID', async t => {
   const ipfs = {}
   const peers = {}
-  const friends = {}
   const syndicate = {}
   const getMessagesPath = () => {}
   const getMessagesList = () => {}
@@ -16,7 +15,6 @@ test('should validate passed peer ID', async t => {
   const addMessage = AddMessage({
     ipfs,
     peers,
-    friends,
     syndicate,
     getMessagesPath,
     getMessagesList,
@@ -31,7 +29,6 @@ test('should validate passed peer ID', async t => {
 test('should validate passed text', async t => {
   const ipfs = {}
   const peers = {}
-  const friends = {}
   const syndicate = {}
   const getMessagesPath = () => {}
   const getMessagesList = () => {}
@@ -40,7 +37,6 @@ test('should validate passed text', async t => {
   const addMessage = AddMessage({
     ipfs,
     peers,
-    friends,
     syndicate,
     getMessagesPath,
     getMessagesList,
@@ -57,7 +53,6 @@ test('should add a message for a peer', async t => {
   const peerId = hat()
   const text = hat()
   let messages = [fakeMessage()]
-  const friendsList = []
 
   const ipfs = {
     _id: hat(),
@@ -69,8 +64,12 @@ test('should add a message for a peer', async t => {
       }
     }
   }
-  const peers = { __unsafe__: { set: () => {} } }
-  const friends = { list: () => friendsList }
+  const peers = {
+    __unsafe__: {
+      set: () => {},
+      get: () => {}
+    }
+  }
   const syndicate = { publish: () => {} }
   const getMessagesPath = peerId => `${repoDir}/${peerId}/messages.json`
   const getMessagesList = () => messages
@@ -79,7 +78,6 @@ test('should add a message for a peer', async t => {
   const addMessage = AddMessage({
     ipfs,
     peers,
-    friends,
     syndicate,
     getMessagesPath,
     getMessagesList,
@@ -98,7 +96,6 @@ test('should add a message for a friend', async t => {
   const text = hat()
   const message = fakeMessage()
   let messages = [message]
-  const friendsList = [peerId]
 
   const ipfs = {
     _id: hat(),
@@ -110,8 +107,15 @@ test('should add a message for a friend', async t => {
       }
     }
   }
-  const peers = { __unsafe__: { set: () => {} } }
-  const friends = { list: () => friendsList }
+  const peers = {
+    __unsafe__: {
+      set: () => {},
+      get: () => ({
+        id: peerId,
+        isFriend: true
+      })
+    }
+  }
   const syndicate = { publish: () => {} }
   const getMessagesPath = peerId => `${repoDir}/${peerId}/messages.json`
   const getMessagesList = () => messages
@@ -120,7 +124,6 @@ test('should add a message for a friend', async t => {
   const addMessage = AddMessage({
     ipfs,
     peers,
-    friends,
     syndicate,
     getMessagesPath,
     getMessagesList,
@@ -140,7 +143,6 @@ test('should limit message history for friends', async t => {
   const text = hat()
   const message = fakeMessage()
   let messages = [message]
-  const friendsList = [peerId]
 
   const ipfs = {
     _id: hat(),
@@ -152,8 +154,15 @@ test('should limit message history for friends', async t => {
       }
     }
   }
-  const peers = { __unsafe__: { set: () => {} } }
-  const friends = { list: () => friendsList }
+  const peers = {
+    __unsafe__: {
+      set: () => {},
+      get: () => ({
+        id: peerId,
+        isFriend: true
+      })
+    }
+  }
   const syndicate = { publish: () => {} }
   const getMessagesPath = peerId => `${repoDir}/${peerId}/messages.json`
   const getMessagesList = () => messages
@@ -162,7 +171,6 @@ test('should limit message history for friends', async t => {
   const addMessage = AddMessage({
     ipfs,
     peers,
-    friends,
     syndicate,
     getMessagesPath,
     getMessagesList,
@@ -181,7 +189,6 @@ test('should add a message from self', async t => {
   const text = hat()
   const message = fakeMessage()
   let messages = [message]
-  const friendsList = []
 
   const ipfs = {
     id: () => ({ id: peerId }),
@@ -192,8 +199,14 @@ test('should add a message from self', async t => {
       }
     }
   }
-  const peers = { __unsafe__: { set: () => {} } }
-  const friends = { list: () => friendsList }
+  const peers = {
+    __unsafe__: {
+      set: () => {},
+      get: () => ({
+        id: peerId
+      })
+    }
+  }
   const syndicate = { publish: () => {} }
   const getMessagesPath = peerId => `${repoDir}/${peerId}/messages.json`
   const getMessagesList = () => messages
@@ -202,7 +215,6 @@ test('should add a message from self', async t => {
   const addMessage = AddMessage({
     ipfs,
     peers,
-    friends,
     syndicate,
     getMessagesPath,
     getMessagesList,

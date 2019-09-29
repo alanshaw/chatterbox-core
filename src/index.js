@@ -31,7 +31,7 @@ module.exports = async (ipfs, options) => {
   const peers = await Peers({ ipfs, mutexManager, config })
   const friends = await Friends({ ipfs, mutexManager, peers, config })
   const peer = await Peer({ ipfs, mutexManager, peers, config })
-  const messages = await Messages({ ipfs, mutexManager, peers, friends, config })
+  const messages = await Messages({ ipfs, mutexManager, peers, config })
   const beacon = await Beacon({ ipfs, peers, peer, config })
 
   const api = { peers, friends, peer, messages }

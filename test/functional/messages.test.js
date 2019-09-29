@@ -60,14 +60,20 @@ test('should broadcast and receive messages', async t => {
     }
   }
 
-  const peers = { __unsafe__: { set: () => {} } }
-  const friends = { list: () => externalPeerId }
+  const peers = {
+    __unsafe__: {
+      set: () => {},
+      get: peerId => {
+        if (peerId === ownPeerId) return { id: peerId }
+        if (peerId === externalPeerId) return { id: peerId, isFriend: true }
+      }
+    }
+  }
 
   const messages = await Messages({
     ipfs,
     mutexManager,
     peers,
-    friends,
     config: {
       peersPath,
       topics: { broadcast: broadcastTopic },
@@ -145,14 +151,12 @@ test('should ignore invalid messages', async t => {
     }
   }
 
-  const peers = { __unsafe__: { set: () => {} } }
-  const friends = { list: () => [] }
+  const peers = {}
 
   const messages = await Messages({
     ipfs,
     mutexManager,
     peers,
-    friends,
     config: {
       peersPath,
       topics: { broadcast: broadcastTopic },

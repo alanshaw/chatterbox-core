@@ -1,7 +1,7 @@
 const Syndicate = require('../lib/syndicate')
 const GetPeerInfo = require('./get-peer-info')
 const SetPeerInfo = require('./set-peer-info')
-const GetPeersFeed = require('./get-peers-feed')
+const GetPeerInfosFeed = require('./get-peer-infos-feed')
 
 const Peers = ({ ipfs, mutexManager, config }) => {
   const getPeerInfoPath = peerId => `${config.peersPath}/${peerId}/info.json`
@@ -10,7 +10,7 @@ const Peers = ({ ipfs, mutexManager, config }) => {
 
   const getPeerInfo = GetPeerInfo({ ipfs, getPeerInfoPath })
   const setPeerInfo = SetPeerInfo({ ipfs, getPeerInfoPath, getPeerInfo, syndicate })
-  const getPeersFeed = GetPeersFeed({
+  const getPeerInfosFeed = GetPeerInfosFeed({
     ipfs,
     peersPath: config.peersPath,
     getPeerInfo: Peers.withPeerMutex(mutexManager, getPeerInfo, 'readLock'),
@@ -20,7 +20,7 @@ const Peers = ({ ipfs, mutexManager, config }) => {
   return {
     get: Peers.withPeerMutex(mutexManager, getPeerInfo, 'readLock'),
     set: Peers.withPeerMutex(mutexManager, setPeerInfo, 'writeLock'),
-    feed: getPeersFeed,
+    feed: getPeerInfosFeed,
     // Allow these API calls to be made when a writeLock has already been
     // acquired for the peer.
     __unsafe__: {

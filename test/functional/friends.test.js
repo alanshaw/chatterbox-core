@@ -4,29 +4,35 @@ import AbortController from 'abort-controller'
 import { pause } from '../_helpers'
 import MutexManager from '../../src/lib/mutex-manager'
 import Friends from '../../src/friends'
+import Peers from '../../src/peers'
 
 test('should add and remove friends', async t => {
   const repoDir = `/TEST-${Date.now()}`
+  const peersPath = `${repoDir}/peers`
   const mutexManager = MutexManager()
 
   const ipfs = {
-    _data: null,
+    _data: {},
     files: {
+      ls: path => Object.keys(ipfs._data),
+      stat: path => {
+        if (!ipfs._data[path]) throw Object.assign(new Error('not found'), { code: 'ERR_NOT_FOUND' })
+      },
       read: path => {
         t.true(path.startsWith(repoDir))
-        if (!ipfs._data) throw Object.assign(new Error('not found'), { code: 'ERR_NOT_FOUND' })
-        return ipfs._data
+        if (!ipfs._data[path]) throw Object.assign(new Error('not found'), { code: 'ERR_NOT_FOUND' })
+        return ipfs._data[path]
       },
       write: (path, data) => {
         t.true(path.startsWith(repoDir))
-        ipfs._data = data
+        ipfs._data[path] = data
       }
     }
   }
 
-  const peers = { set: () => {} }
-
+  const peers = await Peers({ ipfs, mutexManager, config: { peersPath } })
   const friends = await Friends({ ipfs, mutexManager, peers, config: { repoDir } })
+
   const controller = new AbortController()
 
   const friend0 = hat()
@@ -63,5 +69,5 @@ test('should add and remove friends', async t => {
     })()
   ])
 
-  t.deepEqual(friendsList, [friend0, friend2])
+  t.deepEqual(friendsList.map(f => f.id), [friend0, friend2])
 })
