@@ -14,8 +14,8 @@ module.exports = ({ ipfs, repoDir }) => {
         const data = await ipfs.files.read(versionPath)
         repoVersion = JSON.parse(data)
       } catch (err) {
-        if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
-
+        if (err.code === 'ERR_NOT_FOUND' || err.message.includes('does not exist')) {
+          // No repo created yet
         } else {
           throw err
         }
@@ -27,7 +27,10 @@ module.exports = ({ ipfs, repoDir }) => {
       }
 
       // Successful migration \o/
-      await ipfs.files.write(versionPath, JSON.stringify(version))
+      await ipfs.files.write(versionPath, JSON.stringify(version), {
+        create: true,
+        parents: true
+      })
     }
   }
 

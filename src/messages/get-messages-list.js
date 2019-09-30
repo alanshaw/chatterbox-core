@@ -8,7 +8,7 @@ module.exports = ({ ipfs, getMessagesPath }) => {
       const data = await ipfs.files.read(getMessagesPath(peerId))
       return JSON.parse(data)
     } catch (err) {
-      if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
+      if (err.code === 'ERR_NOT_FOUND' || err.message.includes('does not exist')) {
         return []
       }
       throw err

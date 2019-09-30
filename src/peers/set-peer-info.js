@@ -32,7 +32,7 @@ module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
       await ipfs.files.stat(getPeerInfoPath(peerId))
       exists = true
     } catch (err) {
-      if (err.code === 'ERR_NOT_FOUND' || err.message === 'file does not exist') {
+      if (err.code === 'ERR_NOT_FOUND' || err.message.includes('does not exist')) {
         exists = false
       } else {
         throw err
