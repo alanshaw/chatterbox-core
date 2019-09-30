@@ -14,7 +14,7 @@ test('should add and remove friends', async t => {
   const ipfs = {
     _data: {},
     files: {
-      ls: path => Object.keys(ipfs._data),
+      ls: path => Object.keys(ipfs._data).map(k => ({ name: k })),
       stat: path => {
         if (!ipfs._data[path]) throw Object.assign(new Error('not found'), { code: 'ERR_NOT_FOUND' })
       },

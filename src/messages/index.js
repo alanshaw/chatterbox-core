@@ -6,8 +6,7 @@ const GetMessagesList = require('./get-messages-list')
 const SetMessageRead = require('./set-message-read')
 const BroadcastMessage = require('./broadcast-message')
 const GetMessagesFeed = require('./get-messages-feed')
-
-const VERSION = '1.0.0'
+const { PROTOCOL_VERSION } = require('./constants')
 
 const Messages = async ({ ipfs, mutexManager, peers, config }) => {
   const getPeerPath = peerId => `${config.peersPath}/${peerId}`
@@ -57,7 +56,7 @@ const Messages = async ({ ipfs, mutexManager, peers, config }) => {
     log('received chat message %s from %s', id, peerId, chatMsg)
 
     // TODO: support semver?
-    if (chatMsg.version !== VERSION) {
+    if (chatMsg.version !== PROTOCOL_VERSION) {
       return log('incompatible chat message protocol version %s', chatMsg.version)
     }
 
@@ -94,7 +93,7 @@ const Messages = async ({ ipfs, mutexManager, peers, config }) => {
     broadcast: broadcastMessage,
     feed: getMessagesFeed,
     _destroy () {
-      ipfs.pubsub.unsubscribe(config.topic.broadcast, onBroadcastMessage)
+      return ipfs.pubsub.unsubscribe(config.topics.broadcast, onBroadcastMessage)
     }
   }
 }

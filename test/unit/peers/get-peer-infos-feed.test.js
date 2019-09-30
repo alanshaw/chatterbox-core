@@ -41,7 +41,7 @@ test('should yield cached peers first', async t => {
   const getPeerInfo = peerId => cache[peerId]
   const ipfs = {
     files: {
-      ls: () => Object.keys(cache)
+      ls: () => Object.keys(cache).map(k => ({ name: k }))
     }
   }
   const syndicate = {
@@ -67,7 +67,7 @@ test('should yield when a peer is removed', async t => {
   const getPeerInfo = () => peerInfo
   const ipfs = {
     files: {
-      ls: () => [peerInfo.id]
+      ls: () => [{ name: peerInfo.id }]
     }
   }
   const syndicate = {
@@ -128,7 +128,7 @@ test('should yield for time based filter', async t => {
   const getPeerInfo = peerId => cache[peerId]
   const ipfs = {
     files: {
-      ls: () => Object.keys(cache)
+      ls: () => Object.keys(cache).map(k => ({ name: k }))
     }
   }
   const syndicate = {

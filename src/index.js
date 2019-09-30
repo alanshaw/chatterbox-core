@@ -21,7 +21,7 @@ module.exports = async (ipfs, options) => {
       beacon: '/chatterbox/beacon'
     },
     friendsMessageHistorySize: options.friendsMessageHistorySize || 1000,
-    beaconInterval: 5 * 60 * 1000
+    beaconInterval: options.beaconInterval || 5 * 60 * 1000
   }
 
   config.peersPath = `${config.repoDir}/peers`

@@ -1,11 +1,9 @@
 const { Buffer } = require('buffer')
 const log = require('debug')('chatterbox-core:beacon')
 
-const VERSION = '1.0.0'
+const PROTOCOL_VERSION = '1.0.0'
 
 module.exports = async ({ ipfs, peers, peer, config }) => {
-  await ipfs.pubsub.subscribe(config.topics.beacon)
-
   const onBeaconMessage = async msg => {
     const id = msg.seqno.toString('hex')
     const peerId = msg.from
@@ -23,7 +21,7 @@ module.exports = async ({ ipfs, peers, peer, config }) => {
     log('received beacon message %s from %s', id, peerId, beaconMsg)
 
     // TODO: support semver?
-    if (beaconMsg.version !== VERSION) {
+    if (beaconMsg.version !== PROTOCOL_VERSION) {
       return log('incompatible beacon protocol version %s', beaconMsg.version)
     }
 
@@ -60,10 +58,10 @@ module.exports = async ({ ipfs, peers, peer, config }) => {
 
   const intervalId = setInterval(async () => {
     const { name, avatar } = await peer.get()
-    const data = Buffer.from(JSON.stringify({ version: VERSION, name, avatar }))
+    const data = Buffer.from(JSON.stringify({ version: PROTOCOL_VERSION, name, avatar }))
 
     try {
-      await ipfs.pubsub.publish(config.topic.beacon, data)
+      await ipfs.pubsub.publish(config.topics.beacon, data)
     } catch (err) {
       log('failed to publish beacon message', err)
     }
@@ -72,7 +70,7 @@ module.exports = async ({ ipfs, peers, peer, config }) => {
   return {
     _destroy () {
       clearInterval(intervalId)
-      ipfs.pubsub.unsubscribe(config.topic.beacon, onBeaconMessage)
+      return ipfs.pubsub.unsubscribe(config.topics.beacon, onBeaconMessage)
     }
   }
 }

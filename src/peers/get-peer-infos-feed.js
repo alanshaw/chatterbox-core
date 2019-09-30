@@ -26,18 +26,19 @@ module.exports = ({ ipfs, peersPath, getPeerInfo, syndicate }) => {
 
         const updater = source => (async function * () {
           // Yield local peer cache first
+          let files
           try {
-            peers = await ipfs.files.ls(peersPath)
+            files = await ipfs.files.ls(peersPath)
           } catch (err) {
             if (err.code === 'ERR_NOT_FOUND' || err.message.includes('does not exist')) {
-              peers = []
+              files = []
             } else {
               throw err
             }
           }
 
-          peers = await map(peers, peerId => getPeerInfo(peerId), { concurrency: 8 })
-          peers = peers.filter(Boolean).filter(options.filter)
+          peers = await map(files, f => getPeerInfo(f.name), { concurrency: 8 })
+          peers = peers.filter(options.filter)
 
           yield Array.from(peers)
 

@@ -1,3 +1,6 @@
+const { Buffer } = require('buffer')
+const log = require('debug')('chatterbox-core:migrator')
+
 const VERSIONS = Object.freeze([
   '/chatterbox/repo/1.0.0'
 ])
@@ -9,13 +12,15 @@ module.exports = ({ ipfs, repoDir }) => {
     toLatest: () => api.toVersion(VERSIONS[VERSIONS.length - 1]),
 
     async toVersion (version) {
+      log('migrating to %s', version)
+
       let repoVersion
       try {
         const data = await ipfs.files.read(versionPath)
         repoVersion = JSON.parse(data)
       } catch (err) {
         if (err.code === 'ERR_NOT_FOUND' || err.message.includes('does not exist')) {
-          // No repo created yet
+          log('repo not exists')
         } else {
           throw err
         }
@@ -27,7 +32,7 @@ module.exports = ({ ipfs, repoDir }) => {
       }
 
       // Successful migration \o/
-      await ipfs.files.write(versionPath, JSON.stringify(version), {
+      await ipfs.files.write(versionPath, Buffer.from(JSON.stringify(version)), {
         create: true,
         parents: true
       })
