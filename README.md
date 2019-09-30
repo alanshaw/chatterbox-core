@@ -67,8 +67,6 @@ Destroy the chatterbox instance.
 
 `Promise`
 
----
-
 
 ### `cbox.friends`
 
@@ -86,8 +84,6 @@ Manage friends.
 ##### Returns
 
 `Promise`
-
----
 
 #### `cbox.friends.feed([options])`
 
@@ -108,8 +104,6 @@ for await (const friends of cbox.friends.feed())
   friends.forEach(peerInfo => console.log(peerInfo))
 ```
 
----
-
 #### `cbox.friends.remove(peerId)`
 
 ##### Parameters
@@ -119,8 +113,6 @@ for await (const friends of cbox.friends.feed())
 ##### Returns
 
 `Promise`
-
----
 
 
 ### `cbox.messages`
@@ -138,8 +130,6 @@ Send a message to all peers connected to the chatterbox network. Note: this is a
 ##### Returns
 
 `Promise`
-
----
 
 #### `cbox.messages.feed(peerId, [options])`
 
@@ -167,8 +157,6 @@ Each message:
 * `receivedAt: Number`
 * `readAt: Number`
 
----
-
 #### `cbox.messages.list(peerId)`
 
 Get the messages stored for a given peer.
@@ -188,8 +176,6 @@ Each message:
 * `receivedAt: Number`
 * `readAt: Number`
 
----
-
 #### `cbox.messages.read(peerId, messageId)`
 
 Set the `readAt` field for a given message to the current time (if not already set).
@@ -202,8 +188,6 @@ Set the `readAt` field for a given message to the current time (if not already s
 ##### Returns
 
 `Promise`
-
----
 
 
 ### `cbox.peer`
@@ -225,8 +209,6 @@ Get the local peer's info.
     * `receivedAt: Number`
     * `readAt: Number`
 
----
-
 #### `cbox.peer.set(details)`
 
 Set the peer's info.
@@ -240,8 +222,6 @@ Set the peer's info.
 ##### Returns
 
 `Promise`
-
----
 
 
 ### `cbox.peers`
@@ -280,8 +260,6 @@ Each peer info:
     * `readAt: Number`
 * `isFriend: Boolean`
 
----
-
 #### `cbox.peers.gc([options])`
 
 Clean up peers. Pass an optional filter function to avoid collecting friends.
@@ -294,8 +272,6 @@ Clean up peers. Pass an optional filter function to avoid collecting friends.
 ##### Returns
 
 `Promise`
-
----
 
 #### `cbox.peers.get(peerId)`
 
@@ -322,8 +298,6 @@ Peer details:
     * `readAt: Number`
 * `isFriend: Boolean`
 
----
-
 #### `cbox.peers.set(peerId, details)`
 
 Set properties for a peer.
@@ -342,7 +316,6 @@ Set properties for a peer.
         * `readAt: Number`
     * `isFriend: Boolean`
 
----
 
 ## MFS layout
 
