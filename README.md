@@ -245,6 +245,7 @@ Peer details:
     * `text: String`
     * `receivedAt: Number`
     * `readAt: Number`
+* `isFriend: Boolean`
 
 #### `cbox.peers.set(peerId, details)`
 
@@ -254,18 +255,19 @@ Set properties for a peer.
 * `details: Object`
     * `name: String`
     * `avatar: String`
+    * `lastSeenAt: Number`
     * `lastMessage: Object`
         * `id: String`
         * `text: String`
         * `receivedAt: Number`
         * `readAt: Number`
+    * `isFriend: Boolean`
 
 
 ## MFS layout
 
 ```
 /.chatterbox
-├── friends.json  # Array of Peer IDs
 ├── peers
 |   ├── QmPeer0
 |   |   ├── info.json      # Peer info object
@@ -273,18 +275,6 @@ Set properties for a peer.
 |   ├── QmPeer1
 |   └── QmPeer2
 └── version.json  # Data store layout version
-```
-
-### `friends.json`
-
-List of Peer IDs that the user has "made friends" with.
-
-```json
-[
-  "QmFriend0",
-  "QmFriend1",
-  "QmFriend2"
-]
 ```
 
 ### `peers/Qm.../info.json`
@@ -302,7 +292,8 @@ Peer data.
     "text": "Hello World!",
     "receivedAt": 1568883407737,
     "readAt": 1568883407737
-  }
+  },
+  "isFriend": false
 }
 ```
 
