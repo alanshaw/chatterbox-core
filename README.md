@@ -63,7 +63,9 @@ const cbox = await Chatterbox(ipfs, [options])
 
 Destroy the chatterbox instance.
 
-Returns `Promise`
+##### Returns
+
+`Promise`
 
 
 ### `cbox.friends`
@@ -72,22 +74,30 @@ Manage friends.
 
 #### `cbox.friends.add(peerId, [details])`
 
+##### Parameters
+
 * `peerId: String`
 * `details: Object`
     * `name: String`
     * `avatar: String`
 
-Returns `Promise`
+##### Returns
+
+`Promise`
 
 #### `cbox.friends.feed([options])`
 
 Live updating friend list. Same output as [cbox.peers.feed](#cboxpeersfeedoptions) except all peers are friends.
 
+##### Parameters
+
 * `options: Object`
     * `signal: AbortSignal`
     * `filter: Function`
 
-Returns `AsyncIterable<Object[]>`
+##### Returns
+
+`AsyncIterable<Object[]>`
 
 ```js
 for await (const friends of cbox.friends.feed())
@@ -96,9 +106,13 @@ for await (const friends of cbox.friends.feed())
 
 #### `cbox.friends.remove(peerId)`
 
+##### Parameters
+
 * `peerId: String`
 
-Returns `Promise`
+##### Returns
+
+`Promise`
 
 
 ### `cbox.messages`
@@ -109,19 +123,27 @@ Manage messages received from peers.
 
 Send a message to all peers connected to the chatterbox network. Note: this is a temporary PoC API call!
 
+##### Parameters
+
 * `text: String`
 
-Returns `Promise`
+##### Returns
+
+`Promise`
 
 #### `cbox.messages.feed(peerId, [options])`
 
 Live updating list of messages for a given peer.
 
+##### Parameters
+
 * `peerId: String`
 * `options: Object`
     * `signal: AbortSignal`
 
-Returns `AsyncIterable<Object[]>`
+##### Returns
+
+`AsyncIterable<Object[]>`
 
 ```js
 for await (const list of cbox.messages.feed('Qm...'))
@@ -139,7 +161,13 @@ Each message:
 
 Get the messages stored for a given peer.
 
-Returns `Promise<Object[]>`
+##### Parameters
+
+* `peerId: String`
+
+##### Returns
+
+`Promise<Object[]>`
 
 Each message:
 
@@ -152,10 +180,14 @@ Each message:
 
 Set the `readAt` field for a given message to the current time (if not already set).
 
+##### Parameters
+
 * `peerId: String`
 * `messageId: String`
 
-Returns `Promise`
+##### Returns
+
+`Promise`
 
 
 ### `cbox.peer`
@@ -163,6 +195,10 @@ Returns `Promise`
 #### `cbox.peer.get()`
 
 Get the local peer's info.
+
+##### Returns
+
+`Promise<Object>`
 
 * `id: String`
 * `name: String`
@@ -173,17 +209,19 @@ Get the local peer's info.
     * `receivedAt: Number`
     * `readAt: Number`
 
-Returns `Promise<Object>`
-
 #### `cbox.peer.set(details)`
 
 Set the peer's info.
+
+##### Parameters
 
 * `details: Object`
     * `name: String`
     * `avatar: String`
 
-Returns `Promise`
+##### Returns
+
+`Promise`
 
 
 ### `cbox.peers`
@@ -194,11 +232,15 @@ Information about peers in the chatterbox network.
 
 Live updating list of known peers in the chatterbox network.
 
+##### Parameters
+
 * `options: Object`
     * `filter: Function`
     * `signal: AbortSignal`
 
-Returns `AsyncIterable<Object[]>`
+##### Returns
+
+`AsyncIterable<Object[]>`
 
 ```js
 for await (const list of cbox.peers.feed())
@@ -216,23 +258,32 @@ Each peer info:
     * `text: String`
     * `receivedAt: Number`
     * `readAt: Number`
+* `isFriend: Boolean`
 
 #### `cbox.peers.gc([options])`
 
 Clean up peers. Pass an optional filter function to avoid collecting friends.
 
+##### Parameters
+
 * `options: Object`
     * `filter: Function`
 
-Returns `Promise`
+##### Returns
+
+`Promise`
 
 #### `cbox.peers.get(peerId)`
 
 Get details stored for the passed Peer ID.
 
+##### Parameters
+
 * `peerId: String`
 
-Returns `Promise<Object>`
+##### Returns
+
+`Promise<Object>`
 
 Peer details:
 
@@ -250,6 +301,8 @@ Peer details:
 #### `cbox.peers.set(peerId, details)`
 
 Set properties for a peer.
+
+##### Parameters
 
 * `peerId: String`
 * `details: Object`
