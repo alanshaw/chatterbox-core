@@ -29,5 +29,25 @@
     "nyc": "^14.1.1",
     "p-defer": "^3.0.0",
     "standard": "^14.3.1"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alanshaw/chatterbox-core.git"
+  },
+  "keywords": [
+    "chat",
+    "messenger",
+    "im",
+    "p2p",
+    "ipfs",
+    "distributed",
+    "decentralized"
+  ],
+  "bugs": {
+    "url": "https://github.com/alanshaw/chatterbox-core/issues"
+  },
+  "homepage": "https://github.com/alanshaw/chatterbox-core#readme"
 }
