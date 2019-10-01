@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "ava": "^2.4.0",
-    "ipfs": "^0.38.0-rc.6",
+    "ipfs": "^0.38.0",
     "nyc": "^14.1.1",
     "p-defer": "^3.0.0",
     "standard": "^14.3.1"
