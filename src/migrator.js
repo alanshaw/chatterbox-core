@@ -34,7 +34,8 @@ module.exports = ({ ipfs, repoDir }) => {
       // Successful migration \o/
       await ipfs.files.write(versionPath, Buffer.from(JSON.stringify(version)), {
         create: true,
-        parents: true
+        parents: true,
+        truncate: true
       })
     }
   }

@@ -13,7 +13,7 @@ module.exports = ({ ipfs, peers, getMessagesList, getMessagesPath, syndicate }) 
     message.readAt = Date.now()
 
     const data = Buffer.from(JSON.stringify(messages))
-    await ipfs.files.write(getMessagesPath(peerId), data)
+    await ipfs.files.write(getMessagesPath(peerId), data, { truncate: true })
 
     const peer = await peers.__unsafe__.get(peerId)
 

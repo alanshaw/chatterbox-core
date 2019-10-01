@@ -79,7 +79,8 @@ module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
     const data = Buffer.from(JSON.stringify(peerInfo))
     await ipfs.files.write(getPeerInfoPath(peerId), data, {
       create: true,
-      parents: true
+      parents: true,
+      truncate: true
     })
 
     syndicate.publish({ action, id: peerInfo.id, peerInfo })
