@@ -50,12 +50,8 @@ module.exports = ({ ipfs, peersPath, getPeerInfo, syndicate }) => {
                   return peers.concat(diff.peerInfo)
                 } else if (diff.action === 'change') {
                   const index = peers.findIndex(p => p.id === diff.id)
-                  if (index > -1) {
-                    peers[index] = diff.peerInfo
-                    return peers
-                  } else if (options.filter(diff.peerInfo)) {
-                    return peers.concat(diff.peerInfo)
-                  }
+                  if (index === -1) return peers.concat(diff.peerInfo)
+                  peers[index] = diff.peerInfo
                   return peers
                 } else if (diff.action === 'remove') {
                   return peers.filter(p => p.id !== diff.id)

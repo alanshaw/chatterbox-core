@@ -16,7 +16,7 @@ const Messages = async ({ ipfs, mutexManager, peers, config }) => {
 
   const syndicate = Syndicate()
 
-  const setMessageRead = SetMessageRead({ ipfs, getMessagesList, getMessagesPath, syndicate })
+  const setMessageRead = SetMessageRead({ ipfs, peers, getMessagesList, getMessagesPath, syndicate })
   const addMessage = Peers.withPeerMutex(
     mutexManager,
     AddMessage({
