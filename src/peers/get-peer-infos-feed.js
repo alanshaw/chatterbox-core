@@ -5,6 +5,7 @@ const map = require('p-map')
 const pipe = require('it-pipe')
 const keepAlive = require('it-keepalive')
 const log = require('debug')('chatterbox-core:messages:feed')
+const clone = require('clone-deep')
 
 const Yes = () => true
 
@@ -40,7 +41,7 @@ module.exports = ({ ipfs, peersPath, getPeerInfo, syndicate }) => {
           peers = await map(files, f => getPeerInfo(f.name), { concurrency: 8 })
           peers = peers.filter(options.filter)
 
-          yield Array.from(peers)
+          yield clone(peers)
 
           for await (const diffs of source) {
             peers = diffs
@@ -64,14 +65,14 @@ module.exports = ({ ipfs, peersPath, getPeerInfo, syndicate }) => {
               }, peers)
               .filter(options.filter)
 
-            yield Array.from(peers)
+            yield clone(peers)
           }
         })()
 
         yield * pipe(
           options.signal ? abortable(source, options.signal) : source,
           updater,
-          keepAlive(() => peers, {
+          keepAlive(() => clone(peers), {
             shouldKeepAlive () {
               const filteredPeers = peers.filter(options.filter)
               if (filteredPeers.length === peers.length) return false

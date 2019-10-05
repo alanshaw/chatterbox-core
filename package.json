@@ -14,6 +14,7 @@
     "abort-controller": "^3.0.0",
     "abortable-iterator": "^2.1.0",
     "buffer": "^5.4.3",
+    "clone-deep": "^4.0.1",
     "debug": "^4.1.1",
     "hat": "0.0.3",
     "it-keepalive": "^1.0.0",

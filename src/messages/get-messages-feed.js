@@ -3,6 +3,7 @@ const { AbortError } = require('abortable-iterator')
 const pushable = require('it-pushable')
 const pipe = require('it-pipe')
 const log = require('debug')('chatterbox-core:messages:feed')
+const clone = require('clone-deep')
 const Validate = require('./validate')
 
 module.exports = ({ getMessagesList, syndicate }) => {
@@ -25,7 +26,7 @@ module.exports = ({ getMessagesList, syndicate }) => {
           // Yield local peer cache first
           messages = await getMessagesList(peerId)
 
-          yield Array.from(messages)
+          yield clone(messages)
 
           for await (const diffs of source) {
             const oldMessages = messages
@@ -46,7 +47,7 @@ module.exports = ({ getMessagesList, syndicate }) => {
             }, messages)
 
             if (messages !== oldMessages) {
-              yield Array.from(messages)
+              yield clone(messages)
             }
           }
         })()
