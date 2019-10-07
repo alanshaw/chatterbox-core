@@ -1,8 +1,4 @@
-exports.peerId = peerId => {
-  if (typeof peerId !== 'string' || !peerId) {
-    throw new Error('invalid peer ID')
-  }
-}
+exports.peerId = require('../lib/validate').peerId
 
 exports.name = name => {
   if (typeof name !== 'string' || !name) {

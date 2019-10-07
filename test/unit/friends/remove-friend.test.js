@@ -1,9 +1,9 @@
 import test from 'ava'
-import hat from 'hat'
+import { fakePeerId } from '../../_helpers'
 import RemoveFriend from '../../../src/friends/remove-friend'
 
 test('should remove a friend', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   const peerInfos = {
     [peerId]: {
       id: peerId,
@@ -26,7 +26,7 @@ test('should remove a friend', async t => {
 })
 
 test('should not error if peer is already not a friend', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   const peerInfos = {
     [peerId]: {
       id: peerId,

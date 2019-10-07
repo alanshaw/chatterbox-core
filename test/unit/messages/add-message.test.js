@@ -1,5 +1,6 @@
 import test from 'ava'
 import hat from 'hat'
+import { fakePeerId } from '../../_helpers'
 import AddMessage from '../../../src/messages/add-message'
 
 const fakeMessage = () => ({ id: hat(), text: hat(), receivedAt: Date.now() })
@@ -21,8 +22,12 @@ test('should validate passed peer ID', async t => {
     friendsMessageHistorySize
   })
 
-  const err = await t.throwsAsync(addMessage(null))
+  let err
 
+  err = await t.throwsAsync(addMessage(null))
+  t.is(err.message, 'invalid peer ID')
+
+  err = await t.throwsAsync(addMessage('NOT A PEER ID'))
   t.is(err.message, 'invalid peer ID')
 })
 
@@ -43,14 +48,14 @@ test('should validate passed text', async t => {
     friendsMessageHistorySize
   })
 
-  const err = await t.throwsAsync(addMessage(hat(), null))
+  const err = await t.throwsAsync(addMessage(fakePeerId(), null))
 
   t.is(err.message, 'invalid message text')
 })
 
 test('should add a message for a peer', async t => {
   const repoDir = `/${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
   const text = hat()
   let messages = [fakeMessage()]
 
@@ -92,13 +97,13 @@ test('should add a message for a peer', async t => {
 
 test('should add a message for a friend', async t => {
   const repoDir = `/${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
   const text = hat()
   const message = fakeMessage()
   let messages = [message]
 
   const ipfs = {
-    _id: hat(),
+    _id: fakePeerId(),
     id: () => ({ id: ipfs._id }),
     files: {
       write: (path, data) => {
@@ -139,13 +144,13 @@ test('should add a message for a friend', async t => {
 
 test('should limit message history for friends', async t => {
   const repoDir = `/${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
   const text = hat()
   const message = fakeMessage()
   let messages = [message]
 
   const ipfs = {
-    _id: hat(),
+    _id: fakePeerId(),
     id: () => ({ id: ipfs._id }),
     files: {
       write: (path, data) => {
@@ -185,7 +190,7 @@ test('should limit message history for friends', async t => {
 
 test('should add a message from self', async t => {
   const repoDir = `/${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
   const text = hat()
   const message = fakeMessage()
   let messages = [message]

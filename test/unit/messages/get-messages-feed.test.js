@@ -1,5 +1,6 @@
 import test from 'ava'
 import hat from 'hat'
+import { fakePeerId } from '../../_helpers'
 import AbortController from 'abort-controller'
 import GetMessagesFeed from '../../../src/messages/get-messages-feed'
 
@@ -11,13 +12,17 @@ test('should validate passed peer ID', async t => {
 
   const getMessagesFeed = GetMessagesFeed({ getMessagesList, syndicate })
 
-  const err = t.throws(() => getMessagesFeed(null))
+  let err
 
+  err = t.throws(() => getMessagesFeed(null))
+  t.is(err.message, 'invalid peer ID')
+
+  err = t.throws(() => getMessagesFeed('NOT A PEER ID'))
   t.is(err.message, 'invalid peer ID')
 })
 
 test('should yield when messages are added', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   const messages = [fakeMessage(), fakeMessage(), fakeMessage()]
 
   const diffs = [{
@@ -27,7 +32,7 @@ test('should yield when messages are added', async t => {
     message: messages[0]
   }, {
     action: 'add',
-    peerId: hat(), // Not for for our peer
+    peerId: fakePeerId(), // Not for for our peer
     messageId: messages[1].id,
     message: messages[1]
   }, {
@@ -58,7 +63,7 @@ test('should yield when messages are added', async t => {
 })
 
 test('should yield when a message is removed', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   const message = fakeMessage()
   const diff = { action: 'remove', peerId, messageId: message.id }
 
@@ -78,7 +83,7 @@ test('should yield when a message is removed', async t => {
 })
 
 test('should yield when a message is changed', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   const message = fakeMessage()
   const changedMessage = { ...message, readAt: Date.now() }
   const diff = {
@@ -104,7 +109,7 @@ test('should yield when a message is changed', async t => {
 })
 
 test('should be aborted by a signal', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   let interval
 
   const getMessagesList = () => []

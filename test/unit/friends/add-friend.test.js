@@ -1,5 +1,5 @@
 import test from 'ava'
-import hat from 'hat'
+import { fakePeerId } from '../../_helpers'
 import AddFriend from '../../../src/friends/add-friend'
 
 test('should add a friend', async t => {
@@ -14,7 +14,7 @@ test('should add a friend', async t => {
 
   const addFriend = AddFriend({ peers })
 
-  const peerId = hat()
+  const peerId = fakePeerId()
   await addFriend(peerId)
 
   t.true(peerInfos[peerId].isFriend)

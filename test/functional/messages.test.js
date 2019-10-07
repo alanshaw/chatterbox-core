@@ -2,7 +2,7 @@ import test from 'ava'
 import hat from 'hat'
 import AbortController from 'abort-controller'
 import defer from 'p-defer'
-import { pause } from '../_helpers'
+import { pause, fakePeerId } from '../_helpers'
 import MutexManager from '../../src/lib/mutex-manager'
 import Messages from '../../src/messages'
 
@@ -35,7 +35,7 @@ test('should broadcast and receive messages', async t => {
   const subscribed = defer()
 
   const ipfs = {
-    _id: hat(),
+    _id: fakePeerId(),
     _data: {},
     id: () => ({ id: ipfs._id }),
     files: {
@@ -86,7 +86,7 @@ test('should broadcast and receive messages', async t => {
   const ownPeerId = ipfs._id
   const ownMessages = [hat(), hat(), hat()]
 
-  const externalPeerId = hat()
+  const externalPeerId = fakePeerId()
   const externalMessages = [hat(), hat(), hat()]
 
   const [ownFeedMessages, externalFeedMessages] = await Promise.all([
@@ -126,7 +126,7 @@ test('should ignore invalid messages', async t => {
   const subscribed = defer()
 
   const ipfs = {
-    _id: hat(),
+    _id: fakePeerId(),
     _data: {},
     id: () => ({ id: ipfs._id }),
     files: {
@@ -166,7 +166,7 @@ test('should ignore invalid messages', async t => {
 
   const controller = new AbortController()
 
-  const badActorPeerId = hat()
+  const badActorPeerId = fakePeerId()
 
   const [badActorFeedMessages] = await Promise.all([
     collectMessages(messages, badActorPeerId, controller.signal),

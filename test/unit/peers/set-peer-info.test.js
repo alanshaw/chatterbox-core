@@ -1,5 +1,6 @@
 import test from 'ava'
 import hat from 'hat'
+import { fakePeerId } from '../../_helpers'
 import SetPeerInfo from '../../../src/peers/set-peer-info'
 
 const fakePeerInfoDetails = () => ({
@@ -28,8 +29,12 @@ test('should validate passed peer ID', async t => {
     syndicate
   })
 
-  const err = await t.throwsAsync(setPeerInfo(null))
+  let err
 
+  err = await t.throwsAsync(setPeerInfo(null))
+  t.is(err.message, 'invalid peer ID')
+
+  err = await t.throwsAsync(setPeerInfo('NOT A PEER ID'))
   t.is(err.message, 'invalid peer ID')
 })
 
@@ -47,26 +52,26 @@ test('should validate passed details', async t => {
   })
 
   let err
-  err = await t.throwsAsync(setPeerInfo(hat(), { name: '' }))
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), { name: '' }))
   t.is(err.message, 'invalid name')
 
-  err = await t.throwsAsync(setPeerInfo(hat(), { avatar: '' }))
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), { avatar: '' }))
   t.is(err.message, 'invalid avatar')
 
-  err = await t.throwsAsync(setPeerInfo(hat(), { lastSeenAt: {} }))
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), { lastSeenAt: {} }))
   t.is(err.message, 'invalid last seen time')
 
-  err = await t.throwsAsync(setPeerInfo(hat(), { lastMessage: null }))
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), { lastMessage: null }))
   t.is(err.message, 'invalid message')
 
-  err = await t.throwsAsync(setPeerInfo(hat(), {
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), {
     lastMessage: {
       id: null
     }
   }))
   t.is(err.message, 'invalid message ID')
 
-  err = await t.throwsAsync(setPeerInfo(hat(), {
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), {
     lastMessage: {
       id: hat(),
       text: 12345
@@ -74,7 +79,7 @@ test('should validate passed details', async t => {
   }))
   t.is(err.message, 'invalid message text')
 
-  err = await t.throwsAsync(setPeerInfo(hat(), {
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), {
     lastMessage: {
       id: hat(),
       text: hat(),
@@ -83,7 +88,7 @@ test('should validate passed details', async t => {
   }))
   t.is(err.message, 'invalid message received time')
 
-  err = await t.throwsAsync(setPeerInfo(hat(), {
+  err = await t.throwsAsync(setPeerInfo(fakePeerId(), {
     lastMessage: {
       id: hat(),
       text: hat(),
@@ -96,7 +101,7 @@ test('should validate passed details', async t => {
 
 test('should add peer info', async t => {
   const repoDir = `/TEST-${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
 
   const ipfs = {
     _data: {},
@@ -132,7 +137,7 @@ test('should add peer info', async t => {
 
 test('should update peer info', async t => {
   const repoDir = `/TEST-${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
   const peerInfo = { id: peerId, ...fakePeerInfoDetails() }
 
   const ipfs = {

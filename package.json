@@ -25,6 +25,7 @@
     "p-map": "^3.0.0"
   },
   "devDependencies": {
+    "array-shuffle": "^1.0.1",
     "ava": "^2.4.0",
     "ipfs": "^0.38.0",
     "nyc": "^14.1.1",

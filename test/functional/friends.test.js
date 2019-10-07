@@ -1,7 +1,6 @@
 import test from 'ava'
-import hat from 'hat'
 import AbortController from 'abort-controller'
-import { pause } from '../_helpers'
+import { pause, fakePeerId } from '../_helpers'
 import MutexManager from '../../src/lib/mutex-manager'
 import Friends from '../../src/friends'
 import Peers from '../../src/peers'
@@ -35,9 +34,9 @@ test('should add and remove friends', async t => {
 
   const controller = new AbortController()
 
-  const friend0 = hat()
-  const friend1 = hat()
-  const friend2 = hat()
+  const friend0 = fakePeerId()
+  const friend1 = fakePeerId()
+  const friend2 = fakePeerId()
 
   const [friendsList] = await Promise.all([
     (async () => {

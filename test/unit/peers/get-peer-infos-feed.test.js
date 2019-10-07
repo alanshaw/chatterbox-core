@@ -1,14 +1,14 @@
 import test from 'ava'
 import hat from 'hat'
 import AbortController from 'abort-controller'
-import { pause } from '../../_helpers'
+import { pause, fakePeerId } from '../../_helpers'
 import GetPeerInfosFeed from '../../../src/peers/get-peer-infos-feed'
 
 test('should yield when a peer is added', async t => {
   const repoDir = `/${Date.now()}`
   const peersPath = `${repoDir}/peers`
 
-  const peerInfo = { id: hat() }
+  const peerInfo = { id: fakePeerId() }
   const diff = { action: 'add', id: peerInfo.id, peerInfo }
 
   const getPeerInfo = () => null
@@ -35,7 +35,7 @@ test('should yield cached peers first', async t => {
   const repoDir = `/${Date.now()}`
   const peersPath = `${repoDir}/peers`
 
-  const peerInfo = { id: hat() }
+  const peerInfo = { id: fakePeerId() }
   const cache = { [peerInfo.id]: peerInfo }
 
   const getPeerInfo = peerId => cache[peerId]
@@ -61,7 +61,7 @@ test('should yield when a peer is removed', async t => {
   const repoDir = `/${Date.now()}`
   const peersPath = `${repoDir}/peers`
 
-  const peerInfo = { id: hat() }
+  const peerInfo = { id: fakePeerId() }
   const diff = { action: 'remove', id: peerInfo.id }
 
   const getPeerInfo = () => peerInfo
@@ -97,7 +97,7 @@ test('should be aborted by a signal', async t => {
   }
   const syndicate = {
     join: source => {
-      interval = setInterval(() => source.push({ action: 'add', id: hat() }), 10)
+      interval = setInterval(() => source.push({ action: 'add', id: fakePeerId() }), 10)
     },
     leave: () => {}
   }
@@ -122,7 +122,7 @@ test('should yield for time based filter', async t => {
   const repoDir = `/${Date.now()}`
   const peersPath = `${repoDir}/peers`
 
-  const peerInfo = { id: hat(), lastSeenAt: Date.now() }
+  const peerInfo = { id: fakePeerId(), lastSeenAt: Date.now() }
   const cache = { [peerInfo.id]: peerInfo }
 
   const getPeerInfo = peerId => cache[peerId]

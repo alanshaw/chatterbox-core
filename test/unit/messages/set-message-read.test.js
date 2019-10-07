@@ -1,5 +1,6 @@
 import test from 'ava'
 import hat from 'hat'
+import { fakePeerId } from '../../_helpers'
 import SetMessageRead from '../../../src/messages/set-message-read'
 
 const fakeMessage = () => ({ id: hat(), text: hat(), receivedAt: Date.now() })
@@ -19,8 +20,12 @@ test('should validate passed peer ID', async t => {
     syndicate
   })
 
-  const err = await t.throwsAsync(setMessageRead(null))
+  let err
 
+  err = await t.throwsAsync(setMessageRead(null))
+  t.is(err.message, 'invalid peer ID')
+
+  err = await t.throwsAsync(setMessageRead('NOT A PEER ID'))
   t.is(err.message, 'invalid peer ID')
 })
 
@@ -39,13 +44,13 @@ test('should validate passed message ID', async t => {
     syndicate
   })
 
-  const err = await t.throwsAsync(setMessageRead(hat(), null))
+  const err = await t.throwsAsync(setMessageRead(fakePeerId(), null))
 
   t.is(err.message, 'invalid message ID')
 })
 
 test('should set message read time', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   let messages = [fakeMessage()]
 
   const ipfs = {
@@ -81,7 +86,7 @@ test('should set message read time', async t => {
 })
 
 test('should not set message read time if not exists', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   let messages = [fakeMessage()]
 
   const ipfs = {
@@ -117,7 +122,7 @@ test('should not set message read time if not exists', async t => {
 })
 
 test('should set last message read time', async t => {
-  const peerId = hat()
+  const peerId = fakePeerId()
   const message = fakeMessage()
   let messages = [{ ...message }]
   const peerInfo = {

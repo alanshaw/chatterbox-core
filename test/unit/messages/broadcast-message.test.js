@@ -1,6 +1,7 @@
 import test from 'ava'
 import hat from 'hat'
 import defer from 'p-defer'
+import { fakePeerId } from '../../_helpers'
 import BroadcastMessage from '../../../src/messages/broadcast-message'
 
 test('should validate passed text', async t => {
@@ -21,7 +22,7 @@ test('should broadcast a message', async t => {
   const published = defer()
 
   const ipfs = {
-    _id: hat(),
+    _id: fakePeerId(),
     id: () => ({ id: ipfs._id }),
     pubsub: {
       publish (topic, data) {

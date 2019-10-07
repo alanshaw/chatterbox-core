@@ -1,16 +1,22 @@
 import test from 'ava'
 import hat from 'hat'
+import { fakePeerId } from '../../_helpers'
 import GetMessagesList from '../../../src/messages/get-messages-list'
 
 test('should validate a passed peer ID', async t => {
   const getMessagesList = GetMessagesList({ ipfs: {}, getMessagesPath: () => {} })
-  const err = await t.throwsAsync(getMessagesList(null))
+  let err
+
+  err = await t.throwsAsync(getMessagesList(null))
+  t.is(err.message, 'invalid peer ID')
+
+  err = await t.throwsAsync(getMessagesList('NOT A PEER ID'))
   t.is(err.message, 'invalid peer ID')
 })
 
 test('should retrieve and parse data from correct path', async t => {
   const repoDir = `/${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
 
   const getMessagesPath = peerId => `${repoDir}/${peerId}/messages.json`
   const messagesList = [{
@@ -37,7 +43,7 @@ test('should retrieve and parse data from correct path', async t => {
 
 test('should return empty array when messages file does not exist', async t => {
   const repoDir = `/${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
 
   const getMessagesPath = peerId => `${repoDir}/${peerId}/messages.json`
 
@@ -58,7 +64,7 @@ test('should return empty array when messages file does not exist', async t => {
 
 test('should throw on read error', async t => {
   const repoDir = `/${Date.now()}`
-  const peerId = hat()
+  const peerId = fakePeerId()
 
   const getMessagesPath = peerId => `${repoDir}/${peerId}/messages.json`
 
