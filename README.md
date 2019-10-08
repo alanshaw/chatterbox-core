@@ -262,12 +262,12 @@ Each peer info:
 
 #### `cbox.peers.gc([options])`
 
-Clean up peers. Pass an optional filter function to avoid collecting friends.
+Clean up peers. Pass an optional filter function.
 
 ##### Parameters
 
 * `options: Object`
-    * `filter: Function`
+    * `filter: Function` (default: collect peers last seen more than an hour ago that are _not_ friends)
 
 ##### Returns
 
