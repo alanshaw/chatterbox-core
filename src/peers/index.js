@@ -3,6 +3,7 @@ const GetPeerInfo = require('./get-peer-info')
 const SetPeerInfo = require('./set-peer-info')
 const GetPeerInfosFeed = require('./get-peer-infos-feed')
 const GarbageCollect = require('./garbage-collect')
+const withPeerMutex = require('./with-peer-mutex')
 
 const Peers = ({ ipfs, mutexManager, config }) => {
   const getPeerPath = peerId => `${config.peersPath}/${peerId}`
@@ -41,17 +42,6 @@ const Peers = ({ ipfs, mutexManager, config }) => {
   }
 }
 
-Peers.withPeerMutex = (manager, fn, type) => {
-  return async (...args) => {
-    const mutex = manager.getMutex(`/chatterbox/peers/${args[0]}`)
-    const release = await mutex[type]()
-    try {
-      const res = await fn(...args)
-      return res
-    } finally {
-      release()
-    }
-  }
-}
+Peers.withPeerMutex = withPeerMutex
 
 module.exports = Peers

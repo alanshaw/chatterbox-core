@@ -1,4 +1,4 @@
-const Peers = require('./')
+const withPeerMutex = require('./with-peer-mutex')
 
 const OneHour = 1000 * 60 * 60
 
@@ -24,7 +24,7 @@ module.exports = ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syn
       }
     }
 
-    const maybeCollect = Peers.withPeerMutex(mutexManager, async peerId => {
+    const maybeCollect = withPeerMutex(mutexManager, async peerId => {
       const peerInfo = await getPeerInfo(peerId)
 
       if (!filter(peerInfo)) {
