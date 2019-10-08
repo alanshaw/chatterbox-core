@@ -33,8 +33,8 @@ module.exports = ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syn
       }
     }, 'writeLock')
 
-    for (const peerId of files) {
-      await maybeCollect(peerId)
+    for (const { name } of files) {
+      await maybeCollect(name)
     }
   }
 }
