@@ -1,12 +1,22 @@
-const Peers = require('./peers')
-const Peer = require('./peer')
-const Friends = require('./friends')
-const Messages = require('./messages')
-const MutexManager = require('./lib/mutex-manager')
-const Migrator = require('./migrator')
-const Beacon = require('./beacon')
+import Peers from './peers'
+import Peer from './peer'
+import Friends from './friends'
+import Messages from './messages'
+import MutexManager from './lib/mutex-manager'
+import Migrator from './migrator'
+import Beacon from './beacon'
 
-module.exports = async (ipfs, options) => {
+type ChatterboxOptions = {
+  repoDir?: string,
+  topics?: {
+    broadcast?: string,
+    beacon?: string
+  },
+  friendsMessageHistorySize?: number,
+  beaconInterval?: number
+}
+
+export default async (ipfs: Ipfs, options?: ChatterboxOptions) => {
   options = options || {}
 
   // TODO: setup IPFS to ensure Chatterbox server(s) are in bootstrap
@@ -14,17 +24,18 @@ module.exports = async (ipfs, options) => {
 
   const mutexManager = MutexManager()
 
-  const config = {
-    repoDir: options.repoDir || '/.chatterbox',
-    topics: options.topics || {
+  const repoDir = options.repoDir || '/.chatterbox'
+  const config: ChatterboxConfig = {
+    repoDir,
+    topics: {
       broadcast: '/chatterbox/broadcast',
-      beacon: '/chatterbox/beacon'
+      beacon: '/chatterbox/beacon',
+      ...options.topics || {}
     },
     friendsMessageHistorySize: options.friendsMessageHistorySize || 1000,
-    beaconInterval: options.beaconInterval || 5 * 60 * 1000
+    beaconInterval: options.beaconInterval || 5 * 60 * 1000,
+    peersPath: `${repoDir}/peers`
   }
-
-  config.peersPath = `${config.repoDir}/peers`
 
   await Migrator({ ipfs, repoDir: config.repoDir }).toLatest()
 

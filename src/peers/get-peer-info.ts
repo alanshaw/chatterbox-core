@@ -1,7 +1,10 @@
-const Validate = require('./validate')
+import Validate from './validate'
 
-module.exports = ({ ipfs, getPeerInfoPath }) => {
-  return async peerId => {
+export default ({ ipfs, getPeerInfoPath }: {
+  ipfs: Ipfs,
+  getPeerInfoPath: (peerId: string) => string
+}) => {
+  return async (peerId: string): PeerInfo => {
     Validate.peerId(peerId)
 
     try {
