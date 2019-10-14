@@ -267,7 +267,7 @@ Clean up peers. Pass an optional filter function.
 ##### Parameters
 
 * `options: Object`
-    * `filter: Function` (default: collect peers last seen more than an hour ago that are _not_ friends)
+    * `filter: Function` (default: collect peers last seen more than an hour ago that are _not_ friends and are _not_ the local peer)
 
 ##### Returns
 

@@ -7,11 +7,18 @@ module.exports = ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syn
     options = options || {}
 
     const since = Date.now() - OneHour
-    const filter = options.filter || (peerInfo => {
-      if (peerInfo.isFriend) return true
-      if (!peerInfo.lastSeenAt) return false
-      return peerInfo.lastSeenAt >= since
-    })
+    let filter = options.filter
+
+    if (!filter) {
+      const { id } = await ipfs.id()
+
+      filter = peerInfo => {
+        if (peerInfo.isFriend) return true
+        if (peerInfo.id === id) return true
+        if (!peerInfo.lastSeenAt) return false
+        return peerInfo.lastSeenAt >= since
+      }
+    }
 
     let files
     try {
