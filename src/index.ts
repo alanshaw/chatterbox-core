@@ -5,6 +5,7 @@ import Messages from './messages'
 import MutexManager from './lib/mutex-manager'
 import Migrator from './migrator'
 import Beacon from './beacon'
+import { ChatterboxConfig } from './ChatterboxConfig'
 
 type ChatterboxOptions = {
   repoDir?: string,
@@ -41,7 +42,7 @@ export default async (ipfs: Ipfs, options?: ChatterboxOptions) => {
 
   const peers = await Peers({ ipfs, mutexManager, config })
   const friends = await Friends({ ipfs, mutexManager, peers, config })
-  const peer = await Peer({ ipfs, mutexManager, peers, config })
+  const peer = await Peer({ ipfs, peers })
   const messages = await Messages({ ipfs, mutexManager, peers, config })
   const beacon = await Beacon({ ipfs, peers, peer, config })
 

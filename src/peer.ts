@@ -1,20 +1,17 @@
 import { PeersApi } from './peers'
+import { PeerInfo } from './peers/PeerInfo'
 
-type PeerConfig = {
+type Deps = {
   ipfs: Ipfs,
   peers: PeersApi
 }
 
-type PeerInfo = {
-  id: string
-}
-
-const Peer = ({ ipfs, peers }: PeerConfig) => {
+const Peer = ({ ipfs, peers }: Deps) => {
   const api = {
     async get (): Promise<PeerInfo> {
       const { id } = await ipfs.id()
       const peerInfo = await peers.get(id)
-      return peerInfo || { id }
+      return peerInfo || { id, isFriend: false }
     },
 
     async set (details: { name?: string, avatar?: string }) {

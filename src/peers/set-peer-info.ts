@@ -1,8 +1,17 @@
-const { Buffer } = require('buffer')
-const Validate = require('./validate')
+import * as Validate from './validate'
+import Syndicate from '../lib/syndicate'
+import { PeerInfo } from './PeerInfo'
+import { PeerInfoData } from './PeerInfoData'
 
-module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
-  return async (peerId, details) => {
+type Deps = {
+  ipfs: Ipfs,
+  getPeerInfoPath: (peerId: string) => string,
+  getPeerInfo: (peerId: string) => Promise<PeerInfo | null>,
+  syndicate: Syndicate<PeerInfo>
+}
+
+export default ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }: Deps) => {
+  return async (peerId: string, details: PeerInfoData) => {
     Validate.peerId(peerId)
 
     details = details || {}
@@ -27,23 +36,11 @@ module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
       Validate.isFriend(details.isFriend)
     }
 
-    let exists
-    try {
-      await ipfs.files.stat(getPeerInfoPath(peerId))
-      exists = true
-    } catch (err) {
-      if (err.code === 'ERR_NOT_FOUND' || err.message.includes('does not exist')) {
-        exists = false
-      } else {
-        throw err
-      }
-    }
+    let peerInfo = await getPeerInfo(peerId)
+    let action: 'change' | 'add'
 
-    let peerInfo, action
-
-    if (exists) {
+    if (peerInfo) {
       action = 'change'
-      peerInfo = await getPeerInfo(peerId)
 
       if (details.name || details.name === null) {
         peerInfo.name = details.name
@@ -83,6 +80,6 @@ module.exports = ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }) => {
       truncate: true
     })
 
-    syndicate.publish({ action, id: peerInfo.id, peerInfo })
+    syndicate.publish({ action, id: peerInfo.id, data: peerInfo })
   }
 }

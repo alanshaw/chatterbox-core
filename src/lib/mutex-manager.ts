@@ -5,7 +5,7 @@ export type MutexManager = {
 }
 
 export default (): MutexManager => {
-  const lockers = new Map()
+  const lockers = new Map<string, Mortice>()
   return {
     getMutex (key) {
       let mutex = lockers.get(key)

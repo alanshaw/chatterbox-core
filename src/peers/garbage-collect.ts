@@ -1,9 +1,21 @@
-const withPeerMutex = require('./with-peer-mutex')
+import Syndicate from "../lib/syndicate"
+import { PeerInfo } from "./PeerInfo"
+import { MutexManager } from "../lib/mutex-manager"
+import withPeerMutex from './with-peer-mutex'
 
 const OneHour = 1000 * 60 * 60
 
-module.exports = ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syndicate }) => {
-  return async (options) => {
+type Deps = {
+  ipfs: Ipfs,
+  mutexManager: MutexManager,
+  peersPath: string,
+  getPeerPath: (peerId: string) => string,
+  getPeerInfo: (peerId: string) => Promise<PeerInfo | null>,
+  syndicate: Syndicate<PeerInfo>
+}
+
+export default ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syndicate }: Deps) => {
+  return async (options: { filter: (peerInfo: PeerInfo) => boolean }) => {
     options = options || {}
 
     const since = Date.now() - OneHour
@@ -20,7 +32,7 @@ module.exports = ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syn
       }
     }
 
-    let files
+    let files: { name: string }[]
     try {
       files = await ipfs.files.ls(peersPath)
     } catch (err) {
@@ -34,7 +46,7 @@ module.exports = ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syn
     const maybeCollect = withPeerMutex(mutexManager, async peerId => {
       const peerInfo = await getPeerInfo(peerId)
 
-      if (!filter(peerInfo)) {
+      if (peerInfo && !filter(peerInfo)) {
         await ipfs.files.rm(getPeerPath(peerId), { recursive: true })
         syndicate.publish({ action: 'remove', id: peerId })
       }

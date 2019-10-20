@@ -5,39 +5,28 @@ import SetPeerInfo from './set-peer-info'
 import GetPeerInfosFeed from './get-peer-infos-feed'
 import GarbageCollect from './garbage-collect'
 import withPeerMutex from './with-peer-mutex'
+import { PeerInfo } from './PeerInfo'
+import { ChatterboxConfig } from '../ChatterboxConfig'
+import { PeerInfoData } from './PeerInfoData'
 
-type PeersConfig = {
+type Deps = {
   ipfs: Ipfs,
   mutexManager: MutexManager,
   config: ChatterboxConfig
 }
 
-type PeerInfo = {
-  id: string,
-  name?: string,
-  avatar?: string,
-  lastSeenAt?: number
-  lastMessage?: {
-    id: string,
-    text: string,
-    receivedAt: number,
-    readAt?: number
-  },
-  isFriend: boolean
-}
-
-const Peers = ({ ipfs, mutexManager, config }: PeersConfig) => {
+const Peers = ({ ipfs, mutexManager, config }: Deps) => {
   const getPeerPath = (peerId: string) => `${config.peersPath}/${peerId}`
   const getPeerInfoPath = (peerId: string) => `${getPeerPath(peerId)}/info.json`
 
-  const syndicate = Syndicate()
+  const syndicate = new Syndicate<PeerInfo>()
 
   const getPeerInfo = GetPeerInfo({ ipfs, getPeerInfoPath })
   const setPeerInfo = SetPeerInfo({ ipfs, getPeerInfoPath, getPeerInfo, syndicate })
   const getPeerInfosFeed = GetPeerInfosFeed({
     ipfs,
     peersPath: config.peersPath,
-    getPeerInfo: Peers.withPeerMutex<PeerInfo>(mutexManager, getPeerInfo, 'readLock'),
+    getPeerInfo: Peers.withPeerMutex<PeerInfo | null>(mutexManager, getPeerInfo, 'readLock'),
     syndicate
   })
   const garbageCollect = GarbageCollect({
@@ -50,8 +39,8 @@ const Peers = ({ ipfs, mutexManager, config }: PeersConfig) => {
   })
 
   return {
-    get: Peers.withPeerMutex<PeerInfo>(mutexManager, getPeerInfo, 'readLock'),
-    set: (peerId: string, details: PeerDetails) => {
+    get: Peers.withPeerMutex<PeerInfo | null>(mutexManager, getPeerInfo, 'readLock'),
+    set: (peerId: string, details: PeerInfoData) => {
       return Peers.withPeerMutex(
         mutexManager,
         peerId => setPeerInfo(peerId, details),
