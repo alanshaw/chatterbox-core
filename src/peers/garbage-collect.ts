@@ -2,6 +2,7 @@ import Syndicate from "../lib/syndicate"
 import { PeerInfo } from "./PeerInfo"
 import { MutexManager } from "../lib/mutex-manager"
 import withPeerMutex from './with-peer-mutex'
+import { PeerInfoDiff } from "./PeerInfoDiff"
 
 const OneHour = 1000 * 60 * 60
 
@@ -11,7 +12,7 @@ type Deps = {
   peersPath: string,
   getPeerPath: (peerId: string) => string,
   getPeerInfo: (peerId: string) => Promise<PeerInfo | null>,
-  syndicate: Syndicate<PeerInfo>
+  syndicate: Syndicate<PeerInfoDiff>
 }
 
 export default ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syndicate }: Deps) => {
@@ -48,7 +49,7 @@ export default ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syndi
 
       if (peerInfo && !filter(peerInfo)) {
         await ipfs.files.rm(getPeerPath(peerId), { recursive: true })
-        syndicate.publish({ action: 'remove', id: peerId })
+        syndicate.publish({ action: 'remove', peerId })
       }
     }, 'writeLock')
 

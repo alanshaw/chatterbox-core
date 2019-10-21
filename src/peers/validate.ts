@@ -1,4 +1,4 @@
-import { MessageData } from './MessageData'
+import { MessageData } from '../messages/MessageData'
 
 export { peerId } from '../lib/validate'
 

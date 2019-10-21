@@ -5,6 +5,9 @@ interface Ipfs {
     write: (path: string, data: Buffer, options?: { truncate?: boolean, create?: boolean, parents?: boolean }) => Promise<void>,
     ls: (path: string) => Promise<Array<{ name: string }>>,
     rm: (path: string, options?: { recursive?: boolean }) => Promise<void>
+  },
+  pubsub: {
+    publish: (topic: string, data: Buffer) => Promise<void>
   }
 }
 

@@ -1,7 +1,20 @@
-const Validate = require('./validate')
+import * as Validate from './validate'
+import { PeersApi } from '../peers'
+import Syndicate from '../lib/syndicate'
+import { MessageDiff } from './MessageDiff'
+import GetMessagesList from './get-messages-list'
 
-module.exports = ({ ipfs, peers, getMessagesList, getMessagesPath, syndicate }) => {
-  return async (peerId, messageId) => {
+type Deps = {
+  ipfs: Ipfs
+  peers: PeersApi,
+  syndicate: Syndicate<MessageDiff>,
+  getMessagesPath: (peerId: string) => string,
+  getMessagesList: ReturnType<typeof GetMessagesList>,
+  friendsMessageHistorySize: number
+}
+
+export default ({ ipfs, peers, getMessagesList, getMessagesPath, syndicate }: Deps) => {
+  return async (peerId: string, messageId: string) => {
     Validate.peerId(peerId)
     Validate.messageId(messageId)
 

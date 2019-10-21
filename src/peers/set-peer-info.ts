@@ -2,12 +2,13 @@ import * as Validate from './validate'
 import Syndicate from '../lib/syndicate'
 import { PeerInfo } from './PeerInfo'
 import { PeerInfoData } from './PeerInfoData'
+import { PeerInfoDiff } from './PeerInfoDiff'
 
 type Deps = {
   ipfs: Ipfs,
   getPeerInfoPath: (peerId: string) => string,
   getPeerInfo: (peerId: string) => Promise<PeerInfo | null>,
-  syndicate: Syndicate<PeerInfo>
+  syndicate: Syndicate<PeerInfoDiff>
 }
 
 export default ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }: Deps) => {
@@ -80,6 +81,6 @@ export default ({ ipfs, getPeerInfoPath, getPeerInfo, syndicate }: Deps) => {
       truncate: true
     })
 
-    syndicate.publish({ action, id: peerInfo.id, data: peerInfo })
+    syndicate.publish({ action, peerId: peerInfo.id, peerInfo })
   }
 }

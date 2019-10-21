@@ -8,6 +8,7 @@ import withPeerMutex from './with-peer-mutex'
 import { PeerInfo } from './PeerInfo'
 import { ChatterboxConfig } from '../ChatterboxConfig'
 import { PeerInfoData } from './PeerInfoData'
+import { PeerInfoDiff } from './PeerInfoDiff'
 
 type Deps = {
   ipfs: Ipfs,
@@ -19,7 +20,7 @@ const Peers = ({ ipfs, mutexManager, config }: Deps) => {
   const getPeerPath = (peerId: string) => `${config.peersPath}/${peerId}`
   const getPeerInfoPath = (peerId: string) => `${getPeerPath(peerId)}/info.json`
 
-  const syndicate = new Syndicate<PeerInfo>()
+  const syndicate = new Syndicate<PeerInfoDiff>()
 
   const getPeerInfo = GetPeerInfo({ ipfs, getPeerInfoPath })
   const setPeerInfo = SetPeerInfo({ ipfs, getPeerInfoPath, getPeerInfo, syndicate })

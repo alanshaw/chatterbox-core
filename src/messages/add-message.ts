@@ -1,16 +1,28 @@
-const { Buffer } = require('buffer')
-const hat = require('hat')
-const Validate = require('./validate')
+import hat from 'hat'
+import * as Validate from './validate'
+import { PeersApi } from '../peers'
+import Syndicate from '../lib/syndicate'
+import { Message } from './Message'
+import { MessageDiff } from './MessageDiff'
 
-module.exports = ({
+type Deps = {
+  ipfs: Ipfs
+  peers: PeersApi,
+  syndicate: Syndicate<MessageDiff>,
+  getMessagesPath: (peerId: string) => string,
+  getMessagesList: (peerId: string) => Promise<Message[]>,
+  friendsMessageHistorySize: number
+}
+
+export default ({
   ipfs,
   peers,
   syndicate,
   getMessagesPath,
   getMessagesList,
   friendsMessageHistorySize
-}) => {
-  return async (peerId, text) => {
+}: Deps) => {
+  return async (peerId: string, text: string) => {
     Validate.peerId(peerId)
     Validate.text(text) // TODO: do we need to restrict text size?
 
@@ -19,7 +31,7 @@ module.exports = ({
     const message = { id: messageId, text, receivedAt }
 
     let messages = await getMessagesList(peerId)
-    let removedMessages = []
+    let removedMessages: Message[] = []
 
     const peerInfo = await peers.__unsafe__.get(peerId)
 

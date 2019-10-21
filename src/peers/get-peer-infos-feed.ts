@@ -1,5 +1,5 @@
-import Syndicate, { Diff } from "../lib/syndicate"
-import { PeerInfo } from "./PeerInfo"
+import Syndicate from '../lib/syndicate'
+import { PeerInfo } from './PeerInfo'
 import abortable, { AbortError } from 'abortable-iterator'
 import pushable from 'it-pushable'
 import map from 'p-map'
@@ -7,6 +7,7 @@ import pipe from 'it-pipe'
 import keepAlive from 'it-keepalive'
 import debug from 'debug'
 import clone from 'clone-deep'
+import { PeerInfoDiff } from './PeerInfoDiff'
 
 const log = debug('chatterbox-core:messages:feed')
 const Yes = (peerInfo: PeerInfo) => true
@@ -15,7 +16,7 @@ type Deps = {
   ipfs: Ipfs,
   peersPath: string,
   getPeerInfo: (peerId: string) => Promise<PeerInfo | null>,
-  syndicate: Syndicate<PeerInfo>
+  syndicate: Syndicate<PeerInfoDiff>
 }
 
 type Options = {
@@ -34,13 +35,13 @@ export default ({ ipfs, peersPath, getPeerInfo, syndicate }: Deps) => {
 
       // Stash the pushable for the feed so that any updates
       // that happen while yielding local peer cache are also yielded
-      const source = pushable<Diff<PeerInfo>[], Diff<PeerInfo>>({ writev: true })
+      const source = pushable<PeerInfoDiff[], PeerInfoDiff>({ writev: true })
       syndicate.join(source)
 
       try {
         let peers: PeerInfo[]
 
-        const updater = (source: AsyncIterable<Diff<PeerInfo>[]>) => (async function * () {
+        const updater = (source: AsyncIterable<PeerInfoDiff[]>) => (async function * () {
           // Yield local peer cache first
           let files: { name: string }[]
           try {
@@ -63,14 +64,14 @@ export default ({ ipfs, peersPath, getPeerInfo, syndicate }: Deps) => {
             peers = diffs
               .reduce((peers, diff) => {
                 if (diff.action === 'add') {
-                  return peers.concat(diff.data)
+                  return peers.concat(diff.peerInfo)
                 } else if (diff.action === 'change') {
-                  const index = peers.findIndex(p => p.id === diff.id)
-                  if (index === -1) return peers.concat(diff.data)
-                  peers[index] = diff.data
+                  const index = peers.findIndex(p => p.id === diff.peerId)
+                  if (index === -1) return peers.concat(diff.peerInfo)
+                  peers[index] = diff.peerInfo
                   return peers
                 } else if (diff.action === 'remove') {
-                  return peers.filter(p => p.id !== diff.id)
+                  return peers.filter(p => p.id !== diff.peerId)
                 }
                 log(`unknown action: "${diff.action}"`)
                 return peers
@@ -81,8 +82,8 @@ export default ({ ipfs, peersPath, getPeerInfo, syndicate }: Deps) => {
           }
         })()
 
-        yield * pipe<Diff<PeerInfo>[], PeerInfo[], AsyncIterable<PeerInfo[]>>(
-          options.signal ? abortable<Diff<PeerInfo>[]>(source, options.signal) : source,
+        yield * pipe<PeerInfoDiff[], PeerInfo[], AsyncIterable<PeerInfo[]>>(
+          options.signal ? abortable<PeerInfoDiff[]>(source, options.signal) : source,
           updater,
           keepAlive<PeerInfo[]>(() => clone(peers), {
             shouldKeepAlive () {

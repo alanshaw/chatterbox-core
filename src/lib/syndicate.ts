@@ -3,27 +3,18 @@ import { Pushable } from 'it-pushable'
 
 const log = debug('chatterbox-core:lib:syndicate')
 
-export type Diff<T> = {
-  action: 'add' | 'change',
-  id: string,
-  data: T
-} | {
-  action: 'remove'
-  id: string
-}
-
 export default class Syndicate<K> {
-  private feeds: Pushable<Diff<K>[], Diff<K>>[] = []
+  private feeds: Pushable<K[], K>[] = []
 
-  join (source: Pushable<Diff<K>[], Diff<K>>) {
+  join (source: Pushable<K[], K>) {
     this.feeds.push(source)
   }
 
-  leave (source: Pushable<Diff<K>[], Diff<K>>) {
+  leave (source: Pushable<K[], K>) {
     this.feeds = this.feeds.filter(s => s !== source)
   }
 
-  publish (diff: Diff<K>) {
+  publish (diff: K) {
     log(diff)
     this.feeds.forEach(feed => feed.push(diff))
   }
