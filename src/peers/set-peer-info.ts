@@ -1,3 +1,4 @@
+import { CoreApi } from 'ipfs'
 import * as Validate from './validate'
 import Syndicate from '../lib/syndicate'
 import { PeerInfo } from './PeerInfo'
@@ -5,7 +6,7 @@ import { PeerInfoData } from './PeerInfoData'
 import { PeerInfoDiff } from './PeerInfoDiff'
 
 type Deps = {
-  ipfs: Ipfs,
+  ipfs: CoreApi,
   getPeerInfoPath: (peerId: string) => string,
   getPeerInfo: (peerId: string) => Promise<PeerInfo | null>,
   syndicate: Syndicate<PeerInfoDiff>

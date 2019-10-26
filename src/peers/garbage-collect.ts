@@ -1,13 +1,14 @@
-import Syndicate from "../lib/syndicate"
-import { PeerInfo } from "./PeerInfo"
-import { MutexManager } from "../lib/mutex-manager"
+import { CoreApi } from 'ipfs'
+import Syndicate from '../lib/syndicate'
+import { PeerInfo } from './PeerInfo'
+import { MutexManager } from '../lib/mutex-manager'
 import withPeerMutex from './with-peer-mutex'
-import { PeerInfoDiff } from "./PeerInfoDiff"
+import { PeerInfoDiff } from './PeerInfoDiff'
 
 const OneHour = 1000 * 60 * 60
 
 type Deps = {
-  ipfs: Ipfs,
+  ipfs: CoreApi,
   mutexManager: MutexManager,
   peersPath: string,
   getPeerPath: (peerId: string) => string,

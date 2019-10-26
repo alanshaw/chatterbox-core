@@ -1,8 +1,9 @@
+import { CoreApi } from 'ipfs'
 import * as Validate from './validate'
 import { PeerInfo } from './PeerInfo'
 
 type Deps = {
-  ipfs: Ipfs,
+  ipfs: CoreApi,
   getPeerInfoPath: (peerId: string) => string
 }
 
