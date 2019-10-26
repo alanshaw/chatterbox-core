@@ -1,13 +1,27 @@
-const abortable = require('abortable-iterator')
-const { AbortError } = require('abortable-iterator')
-const pushable = require('it-pushable')
-const pipe = require('it-pipe')
-const log = require('debug')('chatterbox-core:messages:feed')
-const clone = require('clone-deep')
-const Validate = require('./validate')
+import abortable, { AbortError } from 'abortable-iterator'
+import pushable from 'it-pushable'
+import pipe from 'it-pipe'
+import debug from 'debug'
+import clone from 'clone-deep'
+import * as Validate from './validate'
+import GetMessagesList from './get-messages-list'
+import Syndicate from '../lib/syndicate'
+import { MessageDiff } from './MessageDiff'
+import { Message } from './message'
 
-module.exports = ({ getMessagesList, syndicate }) => {
-  return (peerId, options) => {
+const log = debug('chatterbox-core:messages:feed')
+
+type Deps = {
+  getMessagesList: ReturnType<typeof GetMessagesList>
+  syndicate: Syndicate<MessageDiff>
+}
+
+type Options = {
+  signal?: AbortSignal
+}
+
+export default ({ getMessagesList, syndicate }: Deps) => {
+  return (peerId: string, options?: Options) => {
     Validate.peerId(peerId)
     options = options || {}
 
@@ -16,13 +30,13 @@ module.exports = ({ getMessagesList, syndicate }) => {
 
       // Stash the pushable for the feed so that any updates
       // that happen while yielding local messages are also yielded
-      const source = pushable({ writev: true })
+      const source = pushable<MessageDiff[], MessageDiff>({ writev: true })
       syndicate.join(source)
 
       try {
-        let messages = []
+        let messages: Message[] = []
 
-        const updater = source => (async function * () {
+        const updater = (source: AsyncIterable<MessageDiff[]>) => (async function * () {
           // Yield local peer cache first
           messages = await getMessagesList(peerId)
 

@@ -1,8 +1,9 @@
 import * as Validate from './validate'
 import { Message } from './message'
+import { CoreApi } from 'ipfs'
 
 type Deps = {
-  ipfs: Ipfs
+  ipfs: CoreApi
   getMessagesPath: (peerId: string) => string
 }
 

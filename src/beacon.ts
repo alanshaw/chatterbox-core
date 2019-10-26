@@ -1,19 +1,37 @@
-const { Buffer } = require('buffer')
-const log = require('debug')('chatterbox-core:beacon')
+import debug from 'debug'
+import { CoreApi, PubSubMessage } from 'ipfs'
+import { PeersApi } from './peers'
+import { PeerApi } from './peer'
+import { ChatterboxConfig } from './ChatterboxConfig'
+
+const log = debug('chatterbox-core:beacon')
 
 const PROTOCOL_VERSION = '1.0.0'
 
-module.exports = async ({ ipfs, peers, peer, config }) => {
-  const onBeaconMessage = async msg => {
+type Deps = {
+  ipfs: CoreApi,
+  peers: PeersApi,
+  peer: PeerApi,
+  config: ChatterboxConfig
+}
+
+type BeaconMessage = {
+  version: string
+  name?: string
+  avatar?: string
+}
+
+export default async ({ ipfs, peers, peer, config }: Deps) => {
+  const onBeaconMessage = async (msg: PubSubMessage) => {
     const id = msg.seqno.toString('hex')
     const peerId = msg.from
 
     const { id: nodeId } = await ipfs.id()
     if (peerId === nodeId) return
 
-    let beaconMsg
+    let beaconMsg: BeaconMessage
     try {
-      beaconMsg = JSON.parse(msg.data)
+      beaconMsg = JSON.parse(msg.data.toString())
     } catch (err) {
       return log('failed to parse %s from %s', id, peerId, msg.data, err)
     }

@@ -1,3 +1,4 @@
+import { CoreApi } from 'ipfs'
 import * as Validate from './validate'
 import { PeersApi } from '../peers'
 import Syndicate from '../lib/syndicate'
@@ -5,7 +6,7 @@ import { MessageDiff } from './MessageDiff'
 import GetMessagesList from './get-messages-list'
 
 type Deps = {
-  ipfs: Ipfs
+  ipfs: CoreApi
   peers: PeersApi,
   syndicate: Syndicate<MessageDiff>,
   getMessagesPath: (peerId: string) => string,

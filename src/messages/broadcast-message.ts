@@ -1,9 +1,10 @@
 import * as Validate from './validate'
 import { PROTOCOL_VERSION } from './constants'
 import AddMessage from './add-message'
+import { CoreApi } from 'ipfs'
 
 type Deps = {
-  ipfs: Ipfs,
+  ipfs: CoreApi,
   addMessage: ReturnType<typeof AddMessage>
   broadcastTopic: string
 }

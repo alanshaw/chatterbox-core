@@ -1,8 +1,9 @@
+import { CoreApi } from 'ipfs'
 import { PeersApi } from './peers'
 import { PeerInfo } from './peers/PeerInfo'
 
 type Deps = {
-  ipfs: Ipfs,
+  ipfs: CoreApi,
   peers: PeersApi
 }
 
@@ -24,3 +25,5 @@ const Peer = ({ ipfs, peers }: Deps) => {
 }
 
 export default Peer
+
+export type PeerApi = ReturnType<typeof Peer>

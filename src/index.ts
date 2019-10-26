@@ -1,3 +1,4 @@
+import { CoreApi } from 'ipfs'
 import Peers from './peers'
 import Peer from './peer'
 import Friends from './friends'
@@ -17,7 +18,7 @@ type ChatterboxOptions = {
   beaconInterval?: number
 }
 
-export default async (ipfs: Ipfs, options?: ChatterboxOptions) => {
+export default async (ipfs: CoreApi, options?: ChatterboxOptions) => {
   options = options || {}
 
   // TODO: setup IPFS to ensure Chatterbox server(s) are in bootstrap
@@ -40,9 +41,9 @@ export default async (ipfs: Ipfs, options?: ChatterboxOptions) => {
 
   await Migrator({ ipfs, repoDir: config.repoDir }).toLatest()
 
-  const peers = await Peers({ ipfs, mutexManager, config })
-  const friends = await Friends({ ipfs, mutexManager, peers, config })
-  const peer = await Peer({ ipfs, peers })
+  const peers = Peers({ ipfs, mutexManager, config })
+  const friends = Friends({ peers })
+  const peer = Peer({ ipfs, peers })
   const messages = await Messages({ ipfs, mutexManager, peers, config })
   const beacon = await Beacon({ ipfs, peers, peer, config })
 
@@ -51,7 +52,7 @@ export default async (ipfs: Ipfs, options?: ChatterboxOptions) => {
   return {
     ...api,
     destroy: () => Promise.all(
-      [...Object.values(api), beacon].map(o => o._destroy && o._destroy())
+      [...Object.values(api), beacon].map(o => '_destroy' in o ? o._destroy() : null)
     )
   }
 }

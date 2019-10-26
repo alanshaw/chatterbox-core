@@ -9,9 +9,10 @@ import { PeerInfo } from './PeerInfo'
 import { ChatterboxConfig } from '../ChatterboxConfig'
 import { PeerInfoData } from './PeerInfoData'
 import { PeerInfoDiff } from './PeerInfoDiff'
+import { CoreApi } from 'ipfs'
 
 type Deps = {
-  ipfs: Ipfs,
+  ipfs: CoreApi,
   mutexManager: MutexManager,
   config: ChatterboxConfig
 }

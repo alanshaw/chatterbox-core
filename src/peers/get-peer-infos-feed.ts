@@ -1,5 +1,4 @@
-import Syndicate from '../lib/syndicate'
-import { PeerInfo } from './PeerInfo'
+import { CoreApi } from 'ipfs'
 import abortable, { AbortError } from 'abortable-iterator'
 import pushable from 'it-pushable'
 import map from 'p-map'
@@ -7,13 +6,15 @@ import pipe from 'it-pipe'
 import keepAlive from 'it-keepalive'
 import debug from 'debug'
 import clone from 'clone-deep'
+import Syndicate from '../lib/syndicate'
+import { PeerInfo } from './PeerInfo'
 import { PeerInfoDiff } from './PeerInfoDiff'
 
 const log = debug('chatterbox-core:messages:feed')
 const Yes = (peerInfo: PeerInfo) => true
 
 type Deps = {
-  ipfs: Ipfs,
+  ipfs: CoreApi,
   peersPath: string,
   getPeerInfo: (peerId: string) => Promise<PeerInfo | null>,
   syndicate: Syndicate<PeerInfoDiff>

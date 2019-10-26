@@ -1,23 +1,30 @@
-const { Buffer } = require('buffer')
-const log = require('debug')('chatterbox-core:migrator')
+import debug from 'debug'
+import { CoreApi } from 'ipfs'
+
+const log = debug('chatterbox-core:migrator')
 
 const VERSIONS = Object.freeze([
   '/chatterbox/repo/1.0.0'
 ])
 
-module.exports = ({ ipfs, repoDir }) => {
+type Deps = {
+  ipfs: CoreApi,
+  repoDir: string
+}
+
+export default ({ ipfs, repoDir }: Deps) => {
   const versionPath = `${repoDir}/version.json`
 
   const api = {
     toLatest: () => api.toVersion(VERSIONS[VERSIONS.length - 1]),
 
-    async toVersion (version) {
+    async toVersion (version: string) {
       log('migrating to %s', version)
 
       let repoVersion
       try {
         const data = await ipfs.files.read(versionPath)
-        repoVersion = JSON.parse(data)
+        repoVersion = JSON.parse(data.toString())
       } catch (err) {
         if (err.code === 'ERR_NOT_FOUND' || err.message.includes('does not exist')) {
           log('repo not exists')
@@ -43,4 +50,4 @@ module.exports = ({ ipfs, repoDir }) => {
   return api
 }
 
-module.exports.VERSIONS = VERSIONS
+export { VERSIONS }
