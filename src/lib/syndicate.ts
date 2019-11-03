@@ -1,16 +1,16 @@
 import debug from 'debug'
-import { Pushable } from 'it-pushable'
+import { PushableV } from 'it-pushable'
 
 const log = debug('chatterbox-core:lib:syndicate')
 
 export default class Syndicate<K> {
-  private feeds: Pushable<K[], K>[] = []
+  private feeds: PushableV<K>[] = []
 
-  join (source: Pushable<K[], K>) {
+  join (source: PushableV<K>) {
     this.feeds.push(source)
   }
 
-  leave (source: Pushable<K[], K>) {
+  leave (source: PushableV<K>) {
     this.feeds = this.feeds.filter(s => s !== source)
   }
 

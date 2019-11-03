@@ -36,7 +36,7 @@ export default ({ ipfs, peersPath, getPeerInfo, syndicate }: Deps) => {
 
       // Stash the pushable for the feed so that any updates
       // that happen while yielding local peer cache are also yielded
-      const source = pushable<PeerInfoDiff[], PeerInfoDiff>({ writev: true })
+      const source = pushable<PeerInfoDiff>({ writev: true })
       syndicate.join(source)
 
       try {
@@ -83,8 +83,8 @@ export default ({ ipfs, peersPath, getPeerInfo, syndicate }: Deps) => {
           }
         })()
 
-        yield * pipe<PeerInfoDiff[], PeerInfo[], AsyncIterable<PeerInfo[]>>(
-          options.signal ? abortable<PeerInfoDiff[]>(source, options.signal) : source,
+        yield * pipe<AsyncIterable<PeerInfoDiff[]>, AsyncIterable<PeerInfo[]>, AsyncIterable<PeerInfo[]>>(
+          options.signal ? abortable(source, options.signal) : source,
           updater,
           keepAlive<PeerInfo[]>(() => clone(peers), {
             shouldKeepAlive () {

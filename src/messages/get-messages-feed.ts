@@ -30,7 +30,7 @@ export default ({ getMessagesList, syndicate }: Deps) => {
 
       // Stash the pushable for the feed so that any updates
       // that happen while yielding local messages are also yielded
-      const source = pushable<MessageDiff[], MessageDiff>({ writev: true })
+      const source = pushable<MessageDiff>({ writev: true })
       syndicate.join(source)
 
       try {
@@ -66,7 +66,7 @@ export default ({ getMessagesList, syndicate }: Deps) => {
           }
         })()
 
-        yield * pipe(
+        yield * pipe<AsyncIterable<MessageDiff[]>, AsyncIterable<Message[]>>(
           options.signal ? abortable(source, options.signal) : source,
           updater
         )
