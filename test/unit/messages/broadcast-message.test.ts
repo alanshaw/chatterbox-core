@@ -6,7 +6,7 @@ import BroadcastMessage from '../../../src/messages/broadcast-message'
 
 test('should validate passed text', async t => {
   const ipfs = {}
-  const addMessage = () => {}
+  const addMessage = (peerId: string, text: string) => Promise.resolve()
   const broadcastTopic = '/test/broadcast'
 
   const broadcastMessage = BroadcastMessage({ ipfs, addMessage, broadcastTopic })
