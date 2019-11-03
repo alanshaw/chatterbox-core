@@ -1,20 +1,25 @@
 import test from 'ava'
 import hat from 'hat'
+import Substitute, { Arg } from '@fluffy-spoon/substitute'
 import { fakePeerId } from '../../_helpers'
 import AbortController from 'abort-controller'
 import GetMessagesFeed from '../../../src/messages/get-messages-feed'
+import Syndicate from '../../../src/lib/syndicate'
+import { MessageDiff } from '../../../src/messages/MessageDiff'
+import { Message } from '../../../src/messages/message'
+import { AbortError } from 'abortable-iterator'
 
 const fakeMessage = () => ({ id: hat(), text: hat(), receivedAt: Date.now() })
 
 test('should validate passed peer ID', async t => {
-  const syndicate = {}
-  const getMessagesList = () => {}
+  const syndicate = Substitute.for<Syndicate<MessageDiff>>()
+  const getMessagesList = (peerId: string) => Promise.resolve([] as Message[])
 
   const getMessagesFeed = GetMessagesFeed({ getMessagesList, syndicate })
 
-  let err
+  let err: Error
 
-  err = t.throws(() => getMessagesFeed(null))
+  err = t.throws(() => getMessagesFeed(''))
   t.is(err.message, 'invalid peer ID')
 
   err = t.throws(() => getMessagesFeed('NOT A PEER ID'))
@@ -25,7 +30,7 @@ test('should yield when messages are added', async t => {
   const peerId = fakePeerId()
   const messages = [fakeMessage(), fakeMessage(), fakeMessage()]
 
-  const diffs = [{
+  const diffs: MessageDiff[] = [{
     action: 'add',
     peerId,
     messageId: messages[0].id,
@@ -42,15 +47,14 @@ test('should yield when messages are added', async t => {
     message: messages[2]
   }]
 
-  const getMessagesList = () => []
-  const syndicate = {
-    join: source => {
-      diffs.forEach((diff, i) => {
-        setTimeout(() => source.push(diff), i * 10)
-      })
-    },
-    leave: () => {}
-  }
+  const getMessagesList = (peerId: string) => Promise.resolve([] as Message[])
+  const syndicate = Substitute.for<Syndicate<MessageDiff>>()
+
+  syndicate.join(Arg.any()).mimicks(source => {
+    diffs.forEach((diff, i) => {
+      setTimeout(() => source.push(diff), i * 10)
+    })
+  })
 
   const getMessagesFeed = GetMessagesFeed({ getMessagesList, syndicate })
   const messagesFeed = getMessagesFeed(peerId)
@@ -65,13 +69,14 @@ test('should yield when messages are added', async t => {
 test('should yield when a message is removed', async t => {
   const peerId = fakePeerId()
   const message = fakeMessage()
-  const diff = { action: 'remove', peerId, messageId: message.id }
+  const diff: MessageDiff = { action: 'remove', peerId, messageId: message.id }
 
-  const getMessagesList = () => [message]
-  const syndicate = {
-    join: source => setTimeout(() => source.push(diff), 10),
-    leave: () => {}
-  }
+  const getMessagesList = (peerId: string) => Promise.resolve([message])
+  const syndicate = Substitute.for<Syndicate<MessageDiff>>()
+
+  syndicate.join(Arg.any()).mimicks(source => {
+    setTimeout(() => source.push(diff), 10)
+  })
 
   const getMessagesFeed = GetMessagesFeed({ getMessagesList, syndicate })
   const messagesFeed = getMessagesFeed(peerId)
@@ -86,18 +91,19 @@ test('should yield when a message is changed', async t => {
   const peerId = fakePeerId()
   const message = fakeMessage()
   const changedMessage = { ...message, readAt: Date.now() }
-  const diff = {
+  const diff: MessageDiff = {
     action: 'change',
     peerId,
     messageId: message.id,
     message: changedMessage
   }
 
-  const getMessagesList = () => [message]
-  const syndicate = {
-    join: source => setTimeout(() => source.push(diff), 10),
-    leave: () => {}
-  }
+  const getMessagesList = (peerId: string) => Promise.resolve([message])
+  const syndicate = Substitute.for<Syndicate<MessageDiff>>()
+
+  syndicate.join(Arg.any()).mimicks(source => {
+    setTimeout(() => source.push(diff), 10)
+  })
 
   const getMessagesFeed = GetMessagesFeed({ getMessagesList, syndicate })
   const messagesFeed = getMessagesFeed(peerId)
@@ -112,16 +118,15 @@ test('should be aborted by a signal', async t => {
   const peerId = fakePeerId()
   let interval
 
-  const getMessagesList = () => []
-  const syndicate = {
-    join: source => {
-      interval = setInterval(() => {
-        const message = fakeMessage()
-        source.push({ action: 'add', peerId, messageId: message.id, message })
-      }, 10)
-    },
-    leave: () => {}
-  }
+  const getMessagesList = (peerId: string) => Promise.resolve([] as Message[])
+  const syndicate = Substitute.for<Syndicate<MessageDiff>>()
+
+  syndicate.join(Arg.any()).mimicks(source => {
+    interval = setInterval(() => {
+      const message = fakeMessage()
+      source.push({ action: 'add', peerId, messageId: message.id, message })
+    }, 10)
+  })
 
   const getMessagesFeed = GetMessagesFeed({ getMessagesList, syndicate })
   const controller = new AbortController()
@@ -129,7 +134,7 @@ test('should be aborted by a signal', async t => {
 
   setTimeout(() => controller.abort(), 100)
 
-  const err = await t.throwsAsync(async () => {
+  const err = await t.throwsAsync<AbortError>(async () => {
     for await (const messages of messagesFeed) { // eslint-disable-line no-unused-vars
       // noop
     }
