@@ -17,7 +17,7 @@ type Deps = {
 }
 
 export default ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syndicate }: Deps) => {
-  return async (options: { filter: (peerInfo: PeerInfo) => boolean }) => {
+  return async (options?: { filter?: (peerInfo: PeerInfo) => boolean }) => {
     options = options || {}
 
     const since = Date.now() - OneHour
