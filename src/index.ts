@@ -1,8 +1,8 @@
 import { CoreApi } from 'ipfs'
-import Peers from './peers'
-import Peer from './peer'
-import Friends from './friends'
-import Messages from './messages'
+import Peers, { PeersApi } from './peers'
+import Peer, { PeerApi } from './peer'
+import Friends, { FriendsApi } from './friends'
+import Messages, { MessagesApi } from './messages'
 import MutexManager from './lib/mutex-manager'
 import Migrator from './migrator'
 import Beacon from './beacon'
@@ -18,7 +18,15 @@ type ChatterboxOptions = {
   beaconInterval?: number
 }
 
-export default async (ipfs: CoreApi, options?: ChatterboxOptions) => {
+type ChatterboxCoreApi = {
+  peers: PeersApi,
+  friends: FriendsApi,
+  peer: PeerApi,
+  messages: MessagesApi,
+  destroy: () => Promise<void>
+}
+
+export default async function createChatterboxCore (ipfs: CoreApi, options?: ChatterboxOptions): Promise<ChatterboxCoreApi> {
   options = options || {}
 
   // TODO: setup IPFS to ensure Chatterbox server(s) are in bootstrap
@@ -51,8 +59,10 @@ export default async (ipfs: CoreApi, options?: ChatterboxOptions) => {
 
   return {
     ...api,
-    destroy: () => Promise.all(
-      [...Object.values(api), beacon].map(o => '_destroy' in o ? o._destroy() : null)
-    )
+    async destroy () {
+      await Promise.all(
+        [...Object.values(api), beacon].map(o => '_destroy' in o ? o._destroy() : null)
+      )
+    }
   }
 }
