@@ -18,7 +18,7 @@ type ChatterboxOptions = {
   beaconInterval?: number
 }
 
-type ChatterboxCoreApi = {
+export type ChatterboxCoreApi = {
   peers: PeersApi,
   friends: FriendsApi,
   peer: PeerApi,
