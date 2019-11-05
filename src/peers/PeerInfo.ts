@@ -6,5 +6,5 @@ export type PeerInfo = {
   avatar?: string
   lastSeenAt?: number
   lastMessage?: Message
-  isFriend: boolean
+  isFriend?: boolean
 }

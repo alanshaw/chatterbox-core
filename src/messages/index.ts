@@ -26,7 +26,7 @@ type BroadcastMessage = {
   text: string
 }
 
-const Messages = async ({ ipfs, mutexManager, peers, config }: Deps) => {
+const Messages = async ({ ipfs, mutexManager, peers, config }: Deps): Promise<MessagesApi> => {
   const getPeerPath = (peerId: string) => `${config.peersPath}/${peerId}`
   const getMessagesPath = (peerId: string) => `${getPeerPath(peerId)}/messages.json`
 
@@ -124,13 +124,21 @@ const Messages = async ({ ipfs, mutexManager, peers, config }: Deps) => {
       mutexManager,
       (peerId: string) => setMessageRead(peerId, messageId),
       'writeLock'
-    ),
+    )(peerId),
     broadcast: broadcastMessage,
     feed: getMessagesFeed,
     _destroy () {
       return ipfs.pubsub.unsubscribe(config.topics.broadcast, onBroadcastMessage)
     }
   }
+}
+
+export type MessagesApi = {
+  list: ReturnType<typeof GetMessagesList>,
+  read: ReturnType<typeof SetMessageRead>,
+  broadcast: ReturnType<typeof BroadcastMessage>,
+  feed: ReturnType<typeof GetMessagesFeed>,
+  _destroy: () => Promise<void>
 }
 
 export default Messages

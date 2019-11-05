@@ -26,7 +26,7 @@ type Options = {
 }
 
 export default ({ ipfs, peersPath, getPeerInfo, syndicate }: Deps) => {
-  return (options: Options) => {
+  return (options?: Options) => {
     options = options || {}
 
     const filter = options.filter || Yes

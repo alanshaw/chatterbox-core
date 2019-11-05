@@ -15,4 +15,6 @@ const Friends = ({ peers }: Deps) => ({
   feed: GetFriendsFeed({ peers })
 })
 
+export type FriendsApi = ReturnType<typeof Friends>
+
 export default Friends
