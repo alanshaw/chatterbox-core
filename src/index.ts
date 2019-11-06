@@ -18,7 +18,7 @@ type ChatterboxOptions = {
   beaconInterval?: number
 }
 
-export type ChatterboxCoreApi = {
+export type ChatterboxCore = {
   peers: PeersApi,
   friends: FriendsApi,
   peer: PeerApi,
@@ -26,7 +26,10 @@ export type ChatterboxCoreApi = {
   destroy: () => Promise<void>
 }
 
-export default async function createChatterboxCore (ipfs: CoreApi, options?: ChatterboxOptions): Promise<ChatterboxCoreApi> {
+export default async function createChatterboxCore (
+  ipfs: CoreApi,
+  options?: ChatterboxOptions
+): Promise<ChatterboxCore> {
   options = options || {}
 
   // TODO: setup IPFS to ensure Chatterbox server(s) are in bootstrap
@@ -55,13 +58,14 @@ export default async function createChatterboxCore (ipfs: CoreApi, options?: Cha
   const messages = await Messages({ ipfs, mutexManager, peers, config })
   const beacon = await Beacon({ ipfs, peers, peer, config })
 
-  const api = { peers, friends, peer, messages }
-
   return {
-    ...api,
+    peers,
+    friends,
+    peer,
+    messages,
     async destroy () {
       await Promise.all(
-        [...Object.values(api), beacon].map(o => '_destroy' in o ? o._destroy() : null)
+        [peers, friends, peer, messages, beacon].map(o => '_destroy' in o ? o._destroy() : null)
       )
     }
   }

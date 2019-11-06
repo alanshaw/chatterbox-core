@@ -1,9 +1,9 @@
 declare module 'ipfs' {
   type FilesApi = {
-    read: (path: string) => Promise<Buffer>,
-    write: (path: string, data: Buffer, options?: { truncate?: boolean, create?: boolean, parents?: boolean }) => Promise<void>,
-    ls: (path: string) => Promise<Array<{ name: string }>>,
+    ls: (path: string) => Promise<Array<{ name: string }>>
+    read: (path: string) => Promise<Buffer>
     rm: (path: string, options?: { recursive?: boolean }) => Promise<void>
+    write: (path: string, data: Buffer, options?: { truncate?: boolean, create?: boolean, parents?: boolean }) => Promise<void>
   }
 
   type PubSubApi = {
@@ -15,8 +15,8 @@ declare module 'ipfs' {
   type PubSubHandler = (msg: PubSubMessage) => void
 
   export type CoreApi = {
-    id: () => Promise<{ id: string }>,
-    files: FilesApi,
+    id: () => Promise<{ id: string }>
+    files: FilesApi
     pubsub: PubSubApi
   }
 
