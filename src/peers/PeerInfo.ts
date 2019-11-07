@@ -1,4 +1,4 @@
-import { Message } from '../messages/message'
+import { Message } from '../messages/Message'
 
 export type PeerInfo = {
   id: string
