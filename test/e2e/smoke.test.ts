@@ -1,10 +1,15 @@
-import test from 'ava'
-import IPFS from 'ipfs'
+import anyTest, {TestInterface} from 'ava';
+import IPFS, { CoreApi } from 'ipfs'
 import Os from 'os'
 import Path from 'path'
 import Fs from 'fs'
 import hat from 'hat'
-import Chatterbox from '../../'
+import Chatterbox from '../../src'
+
+const test = anyTest as TestInterface<{
+  nodes: CoreApi[]
+  repoDirs: string[]
+}>
 
 const tmpRepoDir = async () => {
   const dir = Path.join(Os.tmpdir(), `chatterbox-core-test-${hat()}`)
@@ -12,7 +17,7 @@ const tmpRepoDir = async () => {
   return dir
 }
 
-const connect = async nodes => {
+const connect = async (nodes: CoreApi[]) => {
   for (const node of nodes) {
     const dests = nodes.filter(n => n !== node)
     for (const dest of dests) {
