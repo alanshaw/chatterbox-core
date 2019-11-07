@@ -7,7 +7,7 @@ import * as Validate from './validate'
 import GetMessagesList from './get-messages-list'
 import Syndicate from '../lib/syndicate'
 import { MessageDiff } from './MessageDiff'
-import { Message } from './message'
+import { Message } from './Message'
 
 const log = debug('chatterbox-core:messages:feed')
 
