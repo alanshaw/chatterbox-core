@@ -7,7 +7,7 @@ import AddMessage from '../../../src/messages/add-message'
 import { PeersApi } from '../../../src/peers'
 import Syndicate from '../../../src/lib/syndicate'
 import { MessageDiff } from '../../../src/messages/MessageDiff'
-import { Message } from '../../../src/messages/message'
+import { Message } from '../../../src/messages/Message'
 
 const fakeMessage = () => ({ id: hat(), text: hat(), receivedAt: Date.now() })
 

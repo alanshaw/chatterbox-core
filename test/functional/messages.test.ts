@@ -7,7 +7,7 @@ import { pause, fakePeerId } from '../_helpers'
 import MutexManager from '../../src/lib/mutex-manager'
 import Messages, { MessagesApi } from '../../src/messages'
 import { PubSubMessage, CoreApi, PubSubHandler } from 'ipfs'
-import { Message } from '../../src/messages/message'
+import { Message } from '../../src/messages/Message'
 import { PeersApi } from '../../src/peers'
 
 const fakePubSubMessage = (from: string, data: Buffer | { version?: string, text?: string }): PubSubMessage => ({

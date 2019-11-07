@@ -6,7 +6,7 @@ import AbortController from 'abort-controller'
 import GetMessagesFeed from '../../../src/messages/get-messages-feed'
 import Syndicate from '../../../src/lib/syndicate'
 import { MessageDiff } from '../../../src/messages/MessageDiff'
-import { Message } from '../../../src/messages/message'
+import { Message } from '../../../src/messages/Message'
 import { AbortError } from 'abortable-iterator'
 
 const fakeMessage = () => ({ id: hat(), text: hat(), receivedAt: Date.now() })

@@ -1,5 +1,5 @@
 import * as Validate from './validate'
-import { Message } from './message'
+import { Message } from './Message'
 import { CoreApi } from 'ipfs'
 
 type Deps = {
