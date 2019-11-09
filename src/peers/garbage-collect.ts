@@ -21,14 +21,15 @@ export default ({ ipfs, mutexManager, peersPath, getPeerPath, getPeerInfo, syndi
     options = options || {}
 
     const since = Date.now() - OneHour
-    let filter = options.filter
+    let filter: (peerInfo: PeerInfo) => boolean
 
-    if (!filter) {
+    if (options.filter) {
+      filter = options.filter
+    } else {
       const { id } = await ipfs.id()
 
       filter = peerInfo => {
-        if (peerInfo.isFriend) return true
-        if (peerInfo.id === id) return true
+        if (peerInfo.isFriend || peerInfo.id === id) return true
         if (!peerInfo.lastSeenAt) return false
         return peerInfo.lastSeenAt >= since
       }
