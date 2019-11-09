@@ -46,6 +46,10 @@
   "directories": {
     "test": "test"
   },
+  "files": [
+    "dist",
+    "typings"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alanshaw/chatterbox-core.git"
