@@ -35,7 +35,7 @@
     "@typescript-eslint/parser": "^2.3.3",
     "array-shuffle": "^1.0.1",
     "ava": "^2.4.0",
-    "ipfs": "^0.39.0",
+    "ipfs": "^0.65.0",
     "nyc": "^14.1.1",
     "p-defer": "^3.0.0",
     "source-map-support": "^0.5.16",
